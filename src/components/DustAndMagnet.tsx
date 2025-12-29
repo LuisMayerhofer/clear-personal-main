@@ -21,6 +21,14 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   // Use a Ref to hold the simulation instance so it persists between renders
   const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
 
+  const magnetsRef = useRef([
+    { x: 150, y: 150, feature: 'age', label: 'Age' },
+    { x: 650, y: 150, feature: 'credit_amount', label: 'Credit Amount' },
+    { x: 150, y: 450, feature: 'duration', label: 'Duration' },
+    { x: 650, y: 450, feature: 'job', label: 'Job' },
+  ]);
+
+
   // 1. Prepare Data: This only re-runs if the underlying scenarios change
   const nodes = useMemo<DnMNode[]>(() => {
     return [profile, ...scenarios].map(d => {
@@ -49,13 +57,7 @@ useEffect(() => {
   if (!svgRef.current) return;
   const svg = d3.select(svgRef.current);
 
-  const magnets = [
-    { x: 150, y: 150, feature: 'age', label: 'Age' },
-    { x: 650, y: 150, feature: 'credit_amount', label: 'Credit Amount' },
-    { x: 150, y: 450, feature: 'duration', label: 'Duration' },
-    { x: 650, y: 450, feature: 'job', label: 'Job' },
-  ];
-
+  
   // Initialize simulation using variables from SIM_CONFIG
   const simulation = d3.forceSimulation<DnMNode>(nodes)
     .alpha(SIM_CONFIG.initialAlpha)
@@ -63,7 +65,7 @@ useEffect(() => {
     .velocityDecay(SIM_CONFIG.velocityDecay)
     .on('tick', () => {
       nodes.forEach(node => {
-        magnets.forEach(mag => {
+        magnetsRef.current.forEach(mag => {
           let val = (node.features[mag.feature as keyof typeof node.features] as number) || 0;
 
           // Normalization logic [cite: 81]
@@ -84,6 +86,29 @@ useEffect(() => {
     });
 
   simulationRef.current = simulation;
+  
+  // Magnet Drag
+  const drag = d3.drag<SVGGElement, any>()
+    .on('start', function() {
+      // Bring the dragged magnet to the front visually
+      d3.select(this).raise();
+    })
+    .on('drag', function(event, d) {
+      // 1. Update the data object directly
+      d.x = event.x;
+      d.y = event.y;
+
+      // 2. Select 'this' (the specific G element being dragged)
+      const g = d3.select(this);
+
+      g.select('rect').attr('x', d.x - 40).attr('y', d.y - 20);
+      g.select('text').attr('x', d.x).attr('y', d.y + 5);
+
+      // 3. Wake up simulation
+      if (simulationRef.current) {
+        simulationRef.current.alpha(0.3).restart(); 
+      }
+    });
 
   // Render initial dust and magnets
   svg.selectAll('circle')
@@ -92,26 +117,43 @@ useEffect(() => {
     .style('cursor', 'pointer')
     .on('click', (event, d) => onScenarioSelect(d as CreditData));
 
+  // Render Magnets
   const magGroups = svg.selectAll('.magnet')
-    .data(magnets)
-    .join('g')
-    .attr('class', 'magnet');
+      .data(magnetsRef.current, (d: any) => d.feature)
+      .join(
+        (enter) => {
+          // Create group and elements only once
+          const g = enter.append('g').attr('class', 'magnet').call(drag as any);
+          
+          g.append('rect')
+            .attr('width', 80).attr('height', 40)
+            .attr('rx', 5).attr('fill', '#DBDBDB').attr('stroke', '#B0B0B0')
+            .style('cursor', 'grab');
 
-  magGroups.append('rect')
-    .attr('x', d => d.x - 40).attr('y', d => d.y - 20)
-    .attr('width', 80).attr('height', 40)
-    .attr('rx', 5).attr('fill', '#DBDBDB').attr('stroke', '#B0B0B0');
+          g.append('text')
+            .attr('text-anchor', 'middle')
+            .style('font-size', '12px').style('font-weight', 'bold')
+            .style('pointer-events', 'none');
+          
+          return g;
+        },
+        (update) => update 
+      );
 
-  magGroups.append('text')
-    .attr('x', d => d.x).attr('y', d => d.y + 5)
-    .attr('text-anchor', 'middle')
-    .style('font-size', '12px').style('font-weight', 'bold')
-    .text(d => d.label);
+    // Sync positions for both new and existing magnets
+    magGroups.select('rect')
+      .attr('x', d => (d as any).x - 40)
+      .attr('y', d => (d as any).y - 20);
 
-  return () => {
-    simulation.stop();
-  };
-}, [nodes]); 
+    magGroups.select('text')
+      .attr('x', d => (d as any).x)
+      .attr('y', d => (d as any).y + 5)
+      .text(d => (d as any).label);
+
+    return () => {
+      simulation.stop();
+    };
+  }, [nodes])
 
 
 // 3. Visual Styling Effect

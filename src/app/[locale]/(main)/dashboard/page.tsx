@@ -237,11 +237,10 @@ const DashboardPage = () => {
   }, []);
 
   const filteredScenarios = useMemo(() => {
-    // 2. Handle the "no data" case inside the hook
     if (!data || !data.scenarios) return [];
     
     return filterScenarios(data.scenarios, filters);
-  }, [data, filters]);
+  }, [data?.scenarios, filters]);
 
   // 3. Early returns now safely come AFTER the hooks
   if (loading) return <p>Loading your application data...</p>;
