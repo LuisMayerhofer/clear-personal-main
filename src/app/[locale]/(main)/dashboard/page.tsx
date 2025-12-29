@@ -2,14 +2,13 @@
 import ActionablesFrame from '@/components/ActionablesFrame';
 import ProbabilityFrame from '@/components/ProbabilityFrame';
 import SpiderPlotFrame from '@/components/SpiderPlotFrame';
-import UMAP, { CreditDataWithPoint } from '@/components/UMAP';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import DustAndMagnet from '@/components/DustAndMagnet';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { CreditData, DashboardData } from './types';
 import MinusSquare from '@/components/Icons/MinusSquare';
 import ArrowExpand from '@/components/Icons/ArrowExpand';
 import PlusSquare from '@/components/Icons/PlusSquare';
 import Info from '@/components/Icons/Info';
-import { Chart as ChartJS } from 'chart.js';
 import { useTranslations } from 'next-intl';
 import { useDashboardStore } from '@/app/stores/dashboardStore';
 import jsonData from '@/python-server/german_credit_umap_with_counterfactuals.json';
@@ -53,7 +52,6 @@ const DashboardPage = () => {
 
   //#region refs
   const dataRef = useRef<DashboardData | null>(null);
-  const chartRef = useRef<ChartJS<'scatter', CreditDataWithPoint[], unknown> | undefined>(null);
   //#endregion refs
 
   const t = useTranslations('dashboard');
@@ -238,6 +236,14 @@ const DashboardPage = () => {
     });
   }, []);
 
+  const filteredScenarios = useMemo(() => {
+    // 2. Handle the "no data" case inside the hook
+    if (!data || !data.scenarios) return [];
+    
+    return filterScenarios(data.scenarios, filters);
+  }, [data, filters]);
+
+  // 3. Early returns now safely come AFTER the hooks
   if (loading) return <p>Loading your application data...</p>;
   if (!data)
     return (
@@ -252,18 +258,6 @@ const DashboardPage = () => {
       </div>
     );
 
-  // Filter scenarios using filters from zustand
-  const filteredScenarios = filterScenarios(data.scenarios, filters);
-
-  const onZoomInClick = () => {
-    const zoomInLevel = 1.1;
-    chartRef.current?.zoom(zoomInLevel);
-  };
-
-  const onZoomOutClick = () => {
-    const zoomOutLevel = 0.9;
-    chartRef.current?.zoom(zoomOutLevel);
-  };
 
   const handleInfoButtonHoverIn = () => {
     setInfoVisible(true);
@@ -322,24 +316,16 @@ const DashboardPage = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">{t('UMAP_title')}</h2>
           </div>
-          <UMAP
-            key={Number(isUMAPextended)}
-            profile={data.profile}
+          <DustAndMagnet
             scenarios={filteredScenarios}
+            profile={data.profile}
             chosenScenario={data.chosenScenario}
             onScenarioSelect={handleScenarioSelect}
             isInfoVisible={isInfoVisible}
-            ref={chartRef}
           />
           <div className="absolute right-[16px] bottom-[16px] flex flex-col items-center gap-[1px]">
             <button onClick={handleExpandClick} className="cursor-pointer">
               <ArrowExpand color="#B0B0B0" />
-            </button>
-            <button onClick={onZoomInClick} className="cursor-pointer">
-              <PlusSquare color="#B0B0B0" />
-            </button>
-            <button onClick={onZoomOutClick} className="cursor-pointer">
-              <MinusSquare color="#B0B0B0" />
             </button>
           </div>
           {renderUMAPInfo()}
