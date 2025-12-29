@@ -22,10 +22,11 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
 
   const magnetsRef = useRef([
-    { x: 150, y: 150, feature: 'age', label: 'Age' },
-    { x: 650, y: 150, feature: 'credit_amount', label: 'Credit Amount' },
-    { x: 150, y: 450, feature: 'duration', label: 'Duration' },
-    { x: 650, y: 450, feature: 'job', label: 'Job' },
+    { x: 100, y: 100, feature: 'age', label: 'Age' },
+    { x: 700, y: 100, feature: 'credit_amount', label: 'Credit Amount' },
+    { x: 400, y: 50,  feature: 'duration', label: 'Duration' },
+    { x: 100, y: 500, feature: 'saving_accounts', label: 'Savings' },
+    { x: 700, y: 500, feature: 'checking_account', label: 'Checking' },
   ]);
 
 
@@ -66,18 +67,49 @@ useEffect(() => {
     .on('tick', () => {
       nodes.forEach(node => {
         magnetsRef.current.forEach(mag => {
-          let val = (node.features[mag.feature as keyof typeof node.features] as number) || 0;
+          const rawVal = node.features[mag.feature as keyof typeof node.features];
+          let val = 0;
 
-          // Normalization logic [cite: 81]
-          if (mag.feature === 'credit_amount') val = val / 15000;
-          if (mag.feature === 'age') val = val / 100;
-          if (mag.feature === 'duration') val = val / 72;
-          if (mag.feature === 'job') val = val / 3;
+          // Handle Numeric Features
+          if (typeof rawVal === 'number') {
+            if (mag.feature === 'credit_amount') {
+              val = (rawVal - 276) / (18424 - 276);
+            } 
+            else if (mag.feature === 'age') {
+              val = (rawVal - 19) / (75 - 19);
+            } 
+            else if (mag.feature === 'duration') {
+              val = (rawVal - 6) / (72 - 6);
+            }
+            else {
+              val = rawVal / 3; // Fallback for 'job' (0-3)
+            }
+          }
 
-          // Apply force using SIM_CONFIG.forceMultiplier [cite: 84]
+          // Handle Categorical Strings (Savings & Checking)
+          else if (typeof rawVal === 'string') {
+            const s = rawVal.toLowerCase();
+            if (s === 'little') val = 0.25;
+            else if (s === 'moderate') val = 0.5;
+            else if (s === 'quite rich') val = 0.75;
+            else if (s === 'rich') val = 1.0;
+            else val = 0; // Covers 'NA', 'none', or 'null'
+          }
+
+          // Ensure val stays within 0-1 range to prevent "super-pulls"
+          val = Math.max(0, Math.min(1, val));
+
+          // Apply force using SIM_CONFIG.forceMultiplier
           node.vx! += (mag.x - node.x!) * (val * SIM_CONFIG.forceMultiplier); 
           node.vy! += (mag.y - node.y!) * (val * SIM_CONFIG.forceMultiplier);
         });
+
+        // ADD BOUNDING BOX CONSTRAINTS
+        const r = 10; // Collision radius from the walls
+        if (node.x! < r) node.x = r;
+        if (node.x! > 800 - r) node.x = 800 - r;
+        if (node.y! < r) node.y = r;
+        if (node.y! > 600 - r) node.y = 600 - r;
       });
 
       svg.selectAll('circle')
@@ -94,17 +126,18 @@ useEffect(() => {
       d3.select(this).raise();
     })
     .on('drag', function(event, d) {
-      // 1. Update the data object directly
-      d.x = event.x;
-      d.y = event.y;
+      // Define boundaries (adjust for half-width/height of the magnet)
+      const paddingX = 40;
+      const paddingY = 20;
 
-      // 2. Select 'this' (the specific G element being dragged)
+      // Clamp values: Math.max(min, Math.min(max, current))
+      d.x = Math.max(paddingX, Math.min(800 - paddingX, event.x));
+      d.y = Math.max(paddingY, Math.min(600 - paddingY, event.y));
+
       const g = d3.select(this);
-
       g.select('rect').attr('x', d.x - 40).attr('y', d.y - 20);
       g.select('text').attr('x', d.x).attr('y', d.y + 5);
 
-      // 3. Wake up simulation
       if (simulationRef.current) {
         simulationRef.current.alpha(0.3).restart(); 
       }
