@@ -66,8 +66,12 @@ useEffect(() => {
     .alpha(SIM_CONFIG.initialAlpha)
     .alphaDecay(SIM_CONFIG.alphaDecay)
     .velocityDecay(SIM_CONFIG.velocityDecay)
+    .force('collide', d3.forceCollide<DnMNode>().radius(12))
     .on('tick', () => {
       nodes.forEach(node => {
+        let totalVx = 0;
+        let totalVy = 0;
+
         magnetsRef.current.forEach(mag => {
           const rawVal = node.features[mag.feature as keyof typeof node.features];
           let val = 0;
@@ -101,10 +105,29 @@ useEffect(() => {
           // Ensure val stays within 0-1 range to prevent "super-pulls"
           val = Math.max(0, Math.min(1, val));
 
-          // Apply force using SIM_CONFIG.forceMultiplier
-          node.vx! += (mag.x - node.x!) * (val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier); 
-          node.vy! += (mag.y - node.y!) * (val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier);
+          const dx = mag.x - node.x!;
+          const dy = mag.y - node.y!;
+          const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+          
+          // Scale the strength by the magnet's current scale
+          const pull = val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier;
+          totalVx += dx * pull;
+          totalVy += dy * pull;
+
+          // Prevents nodes from disappearing under the magnet
+          const buffer = 15;
+          const magW = (SIM_CONFIG.baseMagnetWidth * (mag.scale || 1)) / 2 + buffer;
+          const magH = (SIM_CONFIG.baseMagnetHight * (mag.scale || 1)) / 2 + buffer;
+
+          if (Math.abs(dx) < magW && Math.abs(dy) < magH) {
+            totalVx -= dx * 0.2;
+            totalVy -= dy * 0.2;
+          }
         });
+
+        // Apply the summed forces directly to velocity
+        node.vx = totalVx;
+        node.vy = totalVy;
 
         // ADD BOUNDING BOX CONSTRAINTS
         const r = 10; // Collision radius from the walls
