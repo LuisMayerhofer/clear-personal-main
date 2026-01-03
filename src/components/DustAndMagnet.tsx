@@ -22,11 +22,11 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
 
   const magnetsRef = useRef([
-    { x: 100, y: 100, feature: 'age', label: 'Age' },
-    { x: 700, y: 100, feature: 'credit_amount', label: 'Credit Amount' },
-    { x: 400, y: 50,  feature: 'duration', label: 'Duration' },
-    { x: 100, y: 500, feature: 'saving_accounts', label: 'Savings' },
-    { x: 700, y: 500, feature: 'checking_account', label: 'Checking' },
+    { x: 100, y: 100, feature: 'age', label: 'Age', scale: 1 },
+    { x: 700, y: 100, feature: 'credit_amount', label: 'Credit Amount', scale: 1 },
+    { x: 400, y: 50,  feature: 'duration', label: 'Duration', scale: 1 },
+    { x: 100, y: 500, feature: 'saving_accounts', label: 'Savings', scale: 1 },
+    { x: 700, y: 500, feature: 'checking_account', label: 'Checking', scale: 1 },
   ]);
 
 
@@ -50,7 +50,9 @@ const SIM_CONFIG = {
   forceMultiplier: 0.01,  // Strength of magnetic pull (Higher = faster movement) [cite: 84]
   alphaDecay: 0.02,       // Cooling rate (Lower = simulation runs longer before stopping) [cite: 55]
   velocityDecay: 0.6,     // "Visual Friction" (Higher = heavier dust feel, prevents orbiting) [cite: 70, 97]
-  initialAlpha: 1.0       // Initial energy of the simulation
+  initialAlpha: 1.0,       // Initial energy of the simulation
+  baseMagnetWidth: 80,
+  baseMagnetHight: 40,
 };
 
 // 2. Main Physics Effect
@@ -100,8 +102,8 @@ useEffect(() => {
           val = Math.max(0, Math.min(1, val));
 
           // Apply force using SIM_CONFIG.forceMultiplier
-          node.vx! += (mag.x - node.x!) * (val * SIM_CONFIG.forceMultiplier); 
-          node.vy! += (mag.y - node.y!) * (val * SIM_CONFIG.forceMultiplier);
+          node.vx! += (mag.x - node.x!) * (val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier); 
+          node.vy! += (mag.y - node.y!) * (val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier);
         });
 
         // ADD BOUNDING BOX CONSTRAINTS
@@ -126,18 +128,34 @@ useEffect(() => {
       d3.select(this).raise();
     })
     .on('drag', function(event, d) {
-      // Define boundaries (adjust for half-width/height of the magnet)
-      const paddingX = 40;
-      const paddingY = 20;
+      if (event.sourceEvent.shiftKey) {
+        // --- SHIFT + DRAG: SCALE ---
+        // Moving mouse up decreases dy, so we subtract it to increase scale
+        const sensitivity = 0.01;
+        d.scale = Math.max(0.5, Math.min(3, d.scale - event.dy * sensitivity));
+      } else {
+        // --- NORMAL DRAG: MOVE ---
+        const paddingX = (SIM_CONFIG.baseMagnetWidth * d.scale) / 2;
+        const paddingY = (SIM_CONFIG.baseMagnetHight * d.scale) / 2;
+        d.x = Math.max(paddingX, Math.min(800 - paddingX, event.x));
+        d.y = Math.max(paddingY, Math.min(600 - paddingY, event.y));
+      }
 
-      // Clamp values: Math.max(min, Math.min(max, current))
-      d.x = Math.max(paddingX, Math.min(800 - paddingX, event.x));
-      d.y = Math.max(paddingY, Math.min(600 - paddingY, event.y));
-
+      // Update visuals immediately based on new x, y, and scale
+      const w = SIM_CONFIG.baseMagnetWidth * d.scale;
+      const h = SIM_CONFIG.baseMagnetHight * d.scale;
       const g = d3.select(this);
-      g.select('rect').attr('x', d.x - 40).attr('y', d.y - 20);
-      g.select('text').attr('x', d.x).attr('y', d.y + 5);
 
+      g.select('rect')
+        .attr('width', w)
+        .attr('height', h)
+        .attr('x', d.x - w / 2)
+        .attr('y', d.y - h / 2);
+
+      g.select('text')
+        .attr('x', d.x)
+        .attr('y', d.y + 5);
+      
       if (simulationRef.current) {
         simulationRef.current.alpha(0.3).restart(); 
       }
@@ -155,11 +173,9 @@ useEffect(() => {
       .data(magnetsRef.current, (d: any) => d.feature)
       .join(
         (enter) => {
-          // Create group and elements only once
           const g = enter.append('g').attr('class', 'magnet').call(drag as any);
           
           g.append('rect')
-            .attr('width', 80).attr('height', 40)
             .attr('rx', 5).attr('fill', '#DBDBDB').attr('stroke', '#B0B0B0')
             .style('cursor', 'grab');
 
@@ -170,13 +186,15 @@ useEffect(() => {
           
           return g;
         },
-        (update) => update 
       );
 
     // Sync positions for both new and existing magnets
+    // Centering and Scaling logic for all magnets (enter + update)
     magGroups.select('rect')
-      .attr('x', d => (d as any).x - 40)
-      .attr('y', d => (d as any).y - 20);
+      .attr('width', d => 80 * (d as any).scale)
+      .attr('height', d => 40 * (d as any).scale)
+      .attr('x', d => (d as any).x - (80 * (d as any).scale) / 2)
+      .attr('y', d => (d as any).y - (40 * (d as any).scale) / 2);
 
     magGroups.select('text')
       .attr('x', d => (d as any).x)
