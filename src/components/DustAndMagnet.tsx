@@ -53,6 +53,7 @@ const SIM_CONFIG = {
   initialAlpha: 1.0,       // Initial energy of the simulation
   baseMagnetWidth: 80,
   baseMagnetHight: 40,
+  magnetBoundaryForce: 0.1  // Force with which the nodes are being pushed outside of a magnet when they are underneath it
 };
 
 // 2. Main Physics Effect
