@@ -66,7 +66,6 @@ useEffect(() => {
     .alpha(SIM_CONFIG.initialAlpha)
     .alphaDecay(SIM_CONFIG.alphaDecay)
     .velocityDecay(SIM_CONFIG.velocityDecay)
-    .force('collide', d3.forceCollide<DnMNode>().radius(12))
     .on('tick', () => {
       nodes.forEach(node => {
         let totalVx = 0;
@@ -115,13 +114,13 @@ useEffect(() => {
           totalVy += dy * pull;
 
           // Prevents nodes from disappearing under the magnet
-          const buffer = 15;
+          const buffer = 5;
           const magW = (SIM_CONFIG.baseMagnetWidth * (mag.scale || 1)) / 2 + buffer;
           const magH = (SIM_CONFIG.baseMagnetHight * (mag.scale || 1)) / 2 + buffer;
 
           if (Math.abs(dx) < magW && Math.abs(dy) < magH) {
-            totalVx -= dx * 0.2;
-            totalVy -= dy * 0.2;
+            totalVx -= dx * 0.1;
+            totalVy -= dy * 0.1;
           }
         });
 
