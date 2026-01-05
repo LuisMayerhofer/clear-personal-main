@@ -120,8 +120,8 @@ useEffect(() => {
           const magH = (SIM_CONFIG.baseMagnetHight * (mag.scale || 1)) / 2 + buffer;
 
           if (Math.abs(dx) < magW && Math.abs(dy) < magH) {
-            totalVx -= dx * 0.1;
-            totalVy -= dy * 0.1;
+            totalVx -= dx * SIM_CONFIG.magnetBoundaryForce;
+            totalVy -= dy * SIM_CONFIG.magnetBoundaryForce;
           }
         });
 
