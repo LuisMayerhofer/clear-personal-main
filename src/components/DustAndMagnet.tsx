@@ -53,11 +53,11 @@ const SIM_CONFIG = {
   alphaDecay: 0.02,       // Cooling rate (Lower = simulation runs longer before stopping) [cite: 55]
   velocityDecay: 0.6,     // "Visual Friction" (Higher = heavier dust feel, prevents orbiting) [cite: 70, 97]
   initialAlpha: 1.0,       // Initial energy of the simulation
-  baseMagnetWidth: 80,
-  baseMagnetHight: 40,
+  baseMagnetWidth: 120,
+  baseMagnetHight: 50,
   magnetBoundaryForce: 0.05,  // Force with which the nodes are being pushed outside of a magnet when they are underneath it
-  minWinSizeX: -400,
-  maxWinSizeX: 1200,
+  minWinSizeX: -800,
+  maxWinSizeX: 1600,
   minWinSizeY: -300,
   maxWinSizeY: 900,
 };
@@ -226,7 +226,7 @@ useEffect(() => {
 
           g.append('text')
             .attr('text-anchor', 'middle')
-            .style('font-size', '12px').style('font-weight', 'bold')
+            .style('font-size', 'sm').style('font-weight', 'bold')
             .style('pointer-events', 'none');
           
           return g;
@@ -236,10 +236,10 @@ useEffect(() => {
     // Sync positions for both new and existing magnets
     // Centering and Scaling logic for all magnets (enter + update)
     magGroups.select('rect')
-      .attr('width', d => 80 * (d as any).scale)
-      .attr('height', d => 40 * (d as any).scale)
-      .attr('x', d => (d as any).x - (80 * (d as any).scale) / 2)
-      .attr('y', d => (d as any).y - (40 * (d as any).scale) / 2);
+      .attr('width', d => SIM_CONFIG.baseMagnetWidth * (d as any).scale)
+      .attr('height', d => SIM_CONFIG.baseMagnetHight * (d as any).scale)
+      .attr('x', d => (d as any).x - (SIM_CONFIG.baseMagnetWidth * (d as any).scale) / 2)
+      .attr('y', d => (d as any).y - (SIM_CONFIG.baseMagnetHight * (d as any).scale) / 2);
 
     magGroups.select('text')
       .attr('x', d => (d as any).x)
