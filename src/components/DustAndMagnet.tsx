@@ -17,7 +17,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   chosenScenario // Make sure this is destructured
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  
+  const containerRef = useRef<SVGGElement>(null);
   // Use a Ref to hold the simulation instance so it persists between renders
   const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
 
@@ -53,16 +53,35 @@ const SIM_CONFIG = {
   initialAlpha: 1.0,       // Initial energy of the simulation
   baseMagnetWidth: 80,
   baseMagnetHight: 40,
-  magnetBoundaryForce: 0.1  // Force with which the nodes are being pushed outside of a magnet when they are underneath it
+  magnetBoundaryForce: 0.05,  // Force with which the nodes are being pushed outside of a magnet when they are underneath it
+  minWinSizeX: -400,
+  maxWinSizeX: 1200,
+  minWinSizeY: -300,
+  maxWinSizeY: 900,
 };
 
 // 2. Main Physics Effect
 useEffect(() => {
-  if (!svgRef.current) return;
+  if (!svgRef.current || !containerRef.current) return;
   const svg = d3.select(svgRef.current);
+  const container = d3.select(containerRef.current);
 
+  // Zoom 
+  const zoom = d3.zoom<SVGSVGElement, unknown>()
+    .scaleExtent([0.5, 5]) 
+    .filter((event) => {
+      if (event.type === 'wheel') {
+        return event.ctrlKey;
+      }
+      return !event.ctrlKey && !event.button;
+    })
+    .on('zoom', (event) => {
+      container.attr('transform', event.transform);
+    });
+  svg.call(zoom);
+  svg.on("dblclick.zoom", null); // Disable double-click zoom 
   
-  // Initialize simulation using variables from SIM_CONFIG
+  // Initialize simulation
   const simulation = d3.forceSimulation<DnMNode>(nodes)
     .alpha(SIM_CONFIG.initialAlpha)
     .alphaDecay(SIM_CONFIG.alphaDecay)
@@ -129,15 +148,15 @@ useEffect(() => {
         node.vx = totalVx;
         node.vy = totalVy;
 
-        // ADD BOUNDING BOX CONSTRAINTS
+        // Bounding box constraints
         const r = 10; // Collision radius from the walls
-        if (node.x! < r) node.x = r;
-        if (node.x! > 800 - r) node.x = 800 - r;
-        if (node.y! < r) node.y = r;
-        if (node.y! > 600 - r) node.y = 600 - r;
+        if (node.x! < SIM_CONFIG.minWinSizeX + r) node.x = SIM_CONFIG.minWinSizeX + r;
+        if (node.x! > SIM_CONFIG.maxWinSizeX - r) node.x = SIM_CONFIG.maxWinSizeX - r;
+        if (node.y! < SIM_CONFIG.minWinSizeY + r) node.y = SIM_CONFIG.minWinSizeY + r;
+        if (node.y! > SIM_CONFIG.maxWinSizeY - r) node.y = SIM_CONFIG.maxWinSizeY - r;
       });
 
-      svg.selectAll('circle')
+      container.selectAll('circle')
         .attr('cx', d => (d as DnMNode).x!)
         .attr('cy', d => (d as DnMNode).y!);
     });
@@ -160,8 +179,8 @@ useEffect(() => {
         // --- NORMAL DRAG: MOVE ---
         const paddingX = (SIM_CONFIG.baseMagnetWidth * d.scale) / 2;
         const paddingY = (SIM_CONFIG.baseMagnetHight * d.scale) / 2;
-        d.x = Math.max(paddingX, Math.min(800 - paddingX, event.x));
-        d.y = Math.max(paddingY, Math.min(600 - paddingY, event.y));
+        d.x = Math.max(SIM_CONFIG.minWinSizeX + paddingX, Math.min(SIM_CONFIG.maxWinSizeX - paddingX, event.x));
+        d.y = Math.max(SIM_CONFIG.minWinSizeY + paddingY, Math.min(SIM_CONFIG.maxWinSizeY - paddingY, event.y));
       }
 
       // Update visuals immediately based on new x, y, and scale
@@ -185,14 +204,14 @@ useEffect(() => {
     });
 
   // Render initial dust and magnets
-  svg.selectAll('circle')
+  container.selectAll('circle')
     .data(nodes)
     .join('circle')
     .style('cursor', 'pointer')
     .on('click', (event, d) => onScenarioSelect(d as CreditData));
 
   // Render Magnets
-  const magGroups = svg.selectAll('.magnet')
+  const magGroups = container.selectAll('.magnet')
       .data(magnetsRef.current, (d: any) => d.feature)
       .join(
         (enter) => {
@@ -232,10 +251,10 @@ useEffect(() => {
 
 // 3. Visual Styling Effect
 useEffect(() => {
-  if (!svgRef.current) return;
-  const svg = d3.select(svgRef.current);
+  if (!containerRef.current) return;
+  const container = d3.select(containerRef.current);
 
-  svg.selectAll('circle')
+  container.selectAll('circle')
     .data(nodes)
     .transition()
     .duration(250)
@@ -256,7 +275,9 @@ useEffect(() => {
 
   return (
     <div className={`relative h-full w-full flex-1 cursor-move ${isInfoVisible ? 'blur-xs' : ''}`}>
-      <svg ref={svgRef} width="100%" height="100%" viewBox="0 0 800 600" />
+      <svg ref={svgRef} width="100%" height="100%" viewBox="0 0 800 600">
+        <g ref={containerRef} />
+      </svg>
     </div>
   );
 };
