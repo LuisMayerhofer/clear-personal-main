@@ -16,6 +16,8 @@ import PlusSquare from './PlusSquare';
 import ShieldCheck from './ShieldCheck';
 import UserProfileGroup from './UserProfileGroup';
 
+export { PlusSquare, MinusSquare, ArrowRotateLeft, ArrowExpand };
+
 export const icons = {
   barGroup: BarGroup,
   heart: Heart,

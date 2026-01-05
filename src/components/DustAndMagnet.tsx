@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import * as d3 from 'd3';
 import { CreditData, DashboardData } from '@/app/[locale]/(main)/dashboard/types';
+import { PlusSquare, MinusSquare, ArrowRotateLeft } from '@/components/Icons';
 
 type DnMNode = CreditData & d3.SimulationNodeDatum;
 
@@ -20,6 +21,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   const containerRef = useRef<SVGGElement>(null);
   // Use a Ref to hold the simulation instance so it persists between renders
   const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
+  const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
   const magnetsRef = useRef([
     { x: 100, y: 100, feature: 'age', label: 'Age', scale: 1 },
@@ -80,6 +82,7 @@ useEffect(() => {
     });
   svg.call(zoom);
   svg.on("dblclick.zoom", null); // Disable double-click zoom 
+  zoomBehaviorRef.current = zoom;
   
   // Initialize simulation
   const simulation = d3.forceSimulation<DnMNode>(nodes)
@@ -273,9 +276,59 @@ useEffect(() => {
 
 }, [nodes, chosenScenario, profile.id]);
 
-  return (
-    <div className={`relative h-full w-full flex-1 cursor-move ${isInfoVisible ? 'blur-xs' : ''}`}>
-      <svg ref={svgRef} width="100%" height="100%" viewBox="0 0 800 600">
+const handleZoomIn = () => {
+  if (svgRef.current && zoomBehaviorRef.current) {
+    d3.select(svgRef.current).transition().duration(300).call(zoomBehaviorRef.current.scaleBy, 1.3);
+  }
+};
+const handleZoomOut = () => {
+  if (svgRef.current && zoomBehaviorRef.current) {
+    d3.select(svgRef.current).transition().duration(300).call(zoomBehaviorRef.current.scaleBy, 0.7);
+  }
+};
+const handleResetZoom = () => {
+  if (svgRef.current && zoomBehaviorRef.current) {
+    d3.select(svgRef.current)
+      .transition()
+      .duration(750)
+      .call(zoomBehaviorRef.current.transform, d3.zoomIdentity);
+  }
+};
+
+return (
+    <div className={`relative h-full w-full flex-1 ${isInfoVisible ? 'blur-xs' : ''}`}>
+      {/* ZOOM TOOLBAR */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-row gap-2 bg-white/80 p-1 rounded-md shadow-sm border border-gray-200">
+        <button 
+          onClick={handleZoomOut}
+          className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+          title="Zoom Out"
+        >
+          <MinusSquare />
+        </button>
+        <button 
+          onClick={handleResetZoom}
+          className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+          title="Reset Zoom"
+        >
+          <ArrowRotateLeft />
+        </button>
+        <button 
+          onClick={handleZoomIn}
+          className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+          title="Zoom In"
+        >
+          <PlusSquare />
+        </button>
+      </div>
+
+      <svg 
+        ref={svgRef} 
+        width="100%" 
+        height="100%" 
+        viewBox="0 0 800 600" 
+        className="cursor-move"
+      >
         <g ref={containerRef} />
       </svg>
     </div>
