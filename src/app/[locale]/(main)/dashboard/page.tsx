@@ -310,24 +310,32 @@ const DashboardPage = () => {
       <h1 className="flex-none text-2xl font-bold">{t('dashboard_title')}</h1>
       <div className="flex flex-1 flex-col gap-[18px]">
         <section
-          className={`relative z-2 flex flex-1 grow flex-col rounded-xl bg-white p-[16px] drop-shadow-md transition-all duration-300`}
+          className={`relative z-2 flex flex-1 flex-col rounded-xl bg-white p-[16px] drop-shadow-md transition-all duration-300 min-h-0 
+            ${!isUMAPextended ? 'max-h-[500px]' : 'grow'}`}
         >
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">{t('UMAP_title')}</h2>
           </div>
-          <DustAndMagnet
-            scenarios={filteredScenarios}
-            profile={data.profile}
-            chosenScenario={data.chosenScenario}
-            onScenarioSelect={handleScenarioSelect}
-            isInfoVisible={isInfoVisible}
-          />
+          
+          {/* Wrap the DnM component in a flex-1 min-h-0 container */}
+          <div className="flex-1 min-h-0 w-full overflow-hidden">
+            <DustAndMagnet
+              scenarios={filteredScenarios}
+              profile={data.profile}
+              chosenScenario={data.chosenScenario}
+              onScenarioSelect={handleScenarioSelect}
+              isInfoVisible={isInfoVisible}
+            />
+          </div>
+          
           <div className="absolute right-[16px] bottom-[16px] flex flex-col items-center gap-[1px]">
             <button onClick={handleExpandClick} className="cursor-pointer">
               <ArrowExpand color="#B0B0B0" />
             </button>
           </div>
+          
           {renderUMAPInfo()}
+          
           <div className="absolute top-[16px] right-[16px]">
             <button onMouseEnter={handleInfoButtonHoverIn} onMouseLeave={handleInfoButtonHoverOut}>
               <Info color="#B0B0B0" />
