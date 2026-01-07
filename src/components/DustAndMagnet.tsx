@@ -38,7 +38,9 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   );
 
   const nodes = useMemo<DnMNode[]>(() => {
-    return [profile, ...scenarios].map(d => {
+    // Ensure user profile isn't included twice
+    const otherScenarios = scenarios.filter(s => s.id !== profile.id);
+    return [...otherScenarios, profile].map(d => {
       // Look for existing coordinates in the current simulation to maintain continuity
       const existingNode = simulationRef.current?.nodes().find(n => n.id === d.id);
       return {
@@ -257,7 +259,7 @@ useEffect(() => {
   }, [nodes, activeFeatures])
 
 
-// 3. Visual Styling Effect
+// Visual Styling Effect
 useEffect(() => {
   if (!containerRef.current) return;
   const container = d3.select(containerRef.current);
@@ -278,6 +280,7 @@ useEffect(() => {
     })
     .attr('stroke', (d: DnMNode) => d.id === chosenScenario?.id ? '#000' : '#fff')
     .attr('stroke-width', (d: DnMNode) => d.id === chosenScenario?.id ? 2 : 1);
+    
 
 }, [nodes, chosenScenario, profile.id]);
 
@@ -373,21 +376,21 @@ return (
           className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
           title="Zoom Out"
         >
-          <MinusSquare />
+          <MinusSquare color="#B0B0B0" />
         </button>
         <button 
           onClick={handleResetZoom}
           className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
           title="Reset Zoom"
         >
-          <ArrowRotateLeft />
+          <ArrowRotateLeft color="#B0B0B0"/>
         </button>
         <button 
           onClick={handleZoomIn}
           className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
           title="Zoom In"
         >
-          <PlusSquare />
+          <PlusSquare color="#B0B0B0" />
         </button>
       </div>
 
