@@ -10,6 +10,14 @@ interface DnMProps extends DashboardData {
   isInfoVisible: boolean;
 }
 
+const DEFAULT_MAGNETS = [
+  { x: 100, y: 100, feature: 'age', label: 'Age', scale: 1 },
+  { x: 700, y: 100, feature: 'credit_amount', label: 'Credit Amount', scale: 1 },
+  { x: 400, y: 50,  feature: 'duration', label: 'Duration', scale: 1 },
+  { x: 100, y: 500, feature: 'saving_accounts', label: 'Savings', scale: 1 },
+  { x: 700, y: 500, feature: 'checking_account', label: 'Checking', scale: 1 },
+];
+
 const DustAndMagnet: React.FC<DnMProps> = ({ 
   scenarios, 
   profile, 
@@ -19,17 +27,11 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<SVGGElement>(null);
-  // Use a Ref to hold the simulation instance so it persists between renders
   const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
   const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
-  const magnetsRef = useRef([
-    { x: 100, y: 100, feature: 'age', label: 'Age', scale: 1 },
-    { x: 700, y: 100, feature: 'credit_amount', label: 'Credit Amount', scale: 1 },
-    { x: 400, y: 50,  feature: 'duration', label: 'Duration', scale: 1 },
-    { x: 100, y: 500, feature: 'saving_accounts', label: 'Savings', scale: 1 },
-    { x: 700, y: 500, feature: 'checking_account', label: 'Checking', scale: 1 },
-  ]);
+  // Initialized with a copy of DEFAULT_MAGNETS
+  const magnetsRef = useRef(DEFAULT_MAGNETS.map(m => ({ ...m })));
 
 
   // 1. Prepare Data: This only re-runs if the underlying scenarios change
@@ -276,6 +278,26 @@ useEffect(() => {
 
 }, [nodes, chosenScenario, profile.id]);
 
+// Reset Magnets
+const handleResetMagnets = () => {
+  magnetsRef.current = DEFAULT_MAGNETS.map(m => ({ ...m }));
+
+  if (!containerRef.current) return;
+  const container = d3.select(containerRef.current);
+  const magGroups = container.selectAll('.magnet').data(magnetsRef.current, (d: any) => d.feature);
+
+  magGroups.transition().duration(750).ease(d3.easeCubicInOut);
+  magGroups.select('rect').transition().duration(750)
+    .attr('width', d => SIM_CONFIG.baseMagnetWidth * (d as any).scale)
+    .attr('height', d => SIM_CONFIG.baseMagnetHight * (d as any).scale)
+    .attr('x', d => (d as any).x - (SIM_CONFIG.baseMagnetWidth * (d as any).scale) / 2)
+    .attr('y', d => (d as any).y - (SIM_CONFIG.baseMagnetHight * (d as any).scale) / 2);
+  magGroups.select('text').transition().duration(750)
+    .attr('x', d => (d as any).x).attr('y', d => (d as any).y + 5);
+
+    if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
+};
+
 const handleZoomIn = () => {
   if (svgRef.current && zoomBehaviorRef.current) {
     d3.select(svgRef.current).transition().duration(300).call(zoomBehaviorRef.current.scaleBy, 1.3);
@@ -297,6 +319,12 @@ const handleResetZoom = () => {
 
 return (
     <div className={`relative h-full w-full flex-1 ${isInfoVisible ? 'blur-xs' : ''}`}>
+      {/* MAGNET RESET TOOLBAR*/}
+      <div className="absolute top-4  z-10 flex items-center bg-white/80 p-1 rounded-md shadow-sm border border-gray-200 ">
+        <button onClick={handleResetMagnets} className="flex items-center gap-2 text-sm font-bold text-black hover:text-blue-500 transition-colors" title="Reset Magnets">
+          <span className="opacity-70 group-hover:opacity-100 whitespace-nowrap">Reset Magnets</span>
+        </button>
+      </div>
       {/* ZOOM TOOLBAR */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-row gap-2 bg-white/80 p-1 rounded-md shadow-sm border border-gray-200">
         <button 
