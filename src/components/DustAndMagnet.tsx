@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import * as d3 from 'd3';
 import { CreditData, DashboardData } from '@/app/[locale]/(main)/dashboard/types';
 import { PlusSquare, MinusSquare, ArrowRotateLeft } from '@/components/Icons';
@@ -33,8 +33,10 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   // Initialized with a copy of DEFAULT_MAGNETS
   const magnetsRef = useRef(DEFAULT_MAGNETS.map(m => ({ ...m })));
 
+  const [activeFeatures, setActiveFeatures] = useState<Set<string>>(
+    new Set(DEFAULT_MAGNETS.map(m => m.feature))
+  );
 
-  // 1. Prepare Data: This only re-runs if the underlying scenarios change
   const nodes = useMemo<DnMNode[]>(() => {
     return [profile, ...scenarios].map(d => {
       // Look for existing coordinates in the current simulation to maintain continuity
@@ -49,7 +51,6 @@ const DustAndMagnet: React.FC<DnMProps> = ({
     }) as DnMNode[];
   }, [scenarios, profile]);
 
-// 1. Centralized Configuration (Place this at the top of your component body)
 const SIM_CONFIG = {
   forceMultiplier: 0.01,  // Strength of magnetic pull (Higher = faster movement) [cite: 84]
   alphaDecay: 0.02,       // Cooling rate (Lower = simulation runs longer before stopping) [cite: 55]
@@ -64,7 +65,7 @@ const SIM_CONFIG = {
   maxWinSizeY: 900,
 };
 
-// 2. Main Physics Effect
+// Main Physics Effect
 useEffect(() => {
   if (!svgRef.current || !containerRef.current) return;
   const svg = d3.select(svgRef.current);
@@ -97,6 +98,7 @@ useEffect(() => {
         let totalVy = 0;
 
         magnetsRef.current.forEach(mag => {
+          if (!activeFeatures.has(mag.feature)) return; // Check whether Magnet is active
           const rawVal = node.features[mag.feature as keyof typeof node.features];
           let val = 0;
 
@@ -216,8 +218,9 @@ useEffect(() => {
     .on('click', (event, d) => onScenarioSelect(d as CreditData));
 
   // Render Magnets
+  const activeMagnets = magnetsRef.current.filter(m => activeFeatures.has(m.feature)); // Filter for active magnets
   const magGroups = container.selectAll('.magnet')
-      .data(magnetsRef.current, (d: any) => d.feature)
+      .data(activeMagnets, (d: any) => d.feature)
       .join(
         (enter) => {
           const g = enter.append('g').attr('class', 'magnet').call(drag as any);
@@ -251,7 +254,7 @@ useEffect(() => {
     return () => {
       simulation.stop();
     };
-  }, [nodes])
+  }, [nodes, activeFeatures])
 
 
 // 3. Visual Styling Effect
@@ -278,6 +281,18 @@ useEffect(() => {
 
 }, [nodes, chosenScenario, profile.id]);
 
+
+// Activate/Deactivate Magnet
+const handleToggleMagnet = (feature: string) => {
+  setActiveFeatures(prev => {
+    const next = new Set(prev);
+    if (next.has(feature)) next.delete(feature);
+    else next.add(feature);
+    return next;
+  });
+  if (simulationRef.current) simulationRef.current.alpha(0.3).restart();
+};
+
 // Reset Magnets
 const handleResetMagnets = () => {
   magnetsRef.current = DEFAULT_MAGNETS.map(m => ({ ...m }));
@@ -295,7 +310,8 @@ const handleResetMagnets = () => {
   magGroups.select('text').transition().duration(750)
     .attr('x', d => (d as any).x).attr('y', d => (d as any).y + 5);
 
-    if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
+  setActiveFeatures(new Set(DEFAULT_MAGNETS.map(m => m.feature)));  // Activate all Magnets
+  if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
 };
 
 const handleZoomIn = () => {
@@ -319,14 +335,39 @@ const handleResetZoom = () => {
 
 return (
     <div className={`relative h-full w-full flex-1 ${isInfoVisible ? 'blur-xs' : ''}`}>
-      {/* MAGNET RESET TOOLBAR*/}
-      <div className="absolute top-4  z-10 flex items-center bg-white/80 p-1 rounded-md shadow-sm border border-gray-200 ">
-        <button onClick={handleResetMagnets} className="flex items-center gap-2 text-sm font-bold text-black hover:text-blue-500 transition-colors" title="Reset Magnets">
-          <span className="opacity-70 group-hover:opacity-100 whitespace-nowrap">Reset Magnets</span>
-        </button>
+      {/* MAGNET MANAGEMENT SIDEBAR */}
+      <div className="absolute top-4 left z-20 flex flex-col gap-3 bg-white/80 p-1 rounded-md shadow-sm border border-gray-200">
+        <p className="text-sm font-bold text-gray-800 border-b border-gray-100 pb-2">Magnets:</p>
+        <div className="flex flex-col gap-2 pr-1">
+          {DEFAULT_MAGNETS.map((mag) => (
+            <label key={mag.feature} className="flex items-center gap-3 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                checked={activeFeatures.has(mag.feature)}
+                onChange={() => handleToggleMagnet(mag.feature)}
+                className="w-4 h-4 rounded border-gray-300 text-blue-500"
+              />
+              <span className={`text-sm ${activeFeatures.has(mag.feature) ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>
+                {mag.label}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        <div className="flex justify-center px-1 pb-1">
+          <button 
+            onClick={handleResetMagnets} 
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-lg text-xs font-bold transition-all duration-100 shadow-sm border border-blue-100 hover:border-blue-600 active:scale-95"
+            title="Reset Magnets to Defaults"
+          >
+            <span className="whitespace-nowrap">Reset Magnets</span>
+          </button>
+        </div>
       </div>
+         
+   
       {/* ZOOM TOOLBAR */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-row gap-2 bg-white/80 p-1 rounded-md shadow-sm border border-gray-200">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 flex flex-row gap-2 bg-white/80 p-1 rounded-md shadow-sm border border-gray-200">
         <button 
           onClick={handleZoomOut}
           className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
