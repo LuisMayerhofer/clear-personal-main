@@ -268,11 +268,13 @@ useEffect(() => {
     .data(nodes)
     .transition()
     .duration(250)
-    .attr('r', (d: DnMNode) => {
+    //TODO: ############################ Is this based on Risk? Shouldn't it be base on probability? #######################################################################
+    .attr('r', (d: DnMNode) => { 
       if (d.id === profile.id) return 10;
       const riskValue = typeof d.risk === 'number' ? d.risk : (d.risk === 'good' ? 1 : 0);
-      return 4 + (riskValue * 8); // Size coding based on risk [cite: 139]
+      return 3 + (Math.pow(riskValue, 1.5) * 22); // Size coding based on risk [cite: 139]
     })
+    //TODO: #################################################################################################################################################################
     .attr('fill', (d: DnMNode) => {
       if (d.id === profile.id) return '#FF5655'; // User Red
       if (d.id === chosenScenario?.id) return '#14E9C0'; // Chosen Mint Green
