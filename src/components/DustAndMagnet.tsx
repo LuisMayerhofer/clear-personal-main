@@ -2,12 +2,21 @@ import React, { useEffect, useRef, useMemo, useState } from 'react';
 import * as d3 from 'd3';
 import { CreditData, DashboardData } from '@/app/[locale]/(main)/dashboard/types';
 import { PlusSquare, MinusSquare, ArrowRotateLeft } from '@/components/Icons';
+import Tooltip from './Tooltip';
 
 type DnMNode = CreditData & d3.SimulationNodeDatum;
 
 interface DnMProps extends DashboardData {
   onScenarioSelect: (scenario: CreditData) => void;
   isInfoVisible: boolean;
+}
+
+// Interface for the tooltip position state
+interface TooltipPosition {
+  x: number;
+  y: number;
+  translateY: string;
+  translateX: string;
 }
 
 const DEFAULT_MAGNETS = [
@@ -36,6 +45,12 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   const [activeFeatures, setActiveFeatures] = useState<Set<string>>(
     new Set(DEFAULT_MAGNETS.map(m => m.feature))
   );
+
+  // Tooltip state and effect
+  const [tooltipData, setTooltipData] = useState<CreditData | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
+
+
 
   const nodes = useMemo<DnMNode[]>(() => {
     // Ensure user profile isn't included twice
@@ -104,6 +119,7 @@ useEffect(() => {
           const rawVal = node.features[mag.feature as keyof typeof node.features];
           let val = 0;
 
+          //* Normalization
           // Handle Numeric Features
           if (typeof rawVal === 'number') {
             if (mag.feature === 'credit_amount') {
@@ -217,7 +233,32 @@ useEffect(() => {
     .data(nodes)
     .join('circle')
     .style('cursor', 'pointer')
-    .on('click', (event, d) => onScenarioSelect(d as CreditData));
+    .on('click', (event, d) => {
+      onScenarioSelect(d as CreditData);
+
+      event.stopPropagation();
+
+      // 3. Calculate Position (Pixel-based logic from before)
+      const svgBounds = svgRef.current?.getBoundingClientRect();
+      if (!svgBounds) return;
+      const x = event.clientX - svgBounds.left;
+      const y = event.clientY - svgBounds.top;
+      
+      let translateY = '5%';
+      let translateX = '-50%'; 
+      if (y > svgBounds.height * 0.6) {
+           translateY = '-105%';
+      }
+      if (x > svgBounds.width - 200) {
+           translateX = '-100%';
+      } else if (x < 200) {
+          translateX = '0%';
+      }
+      // 4. Show Tooltip
+      setTooltipData(d as CreditData);
+      setTooltipPosition({ x, y, translateX, translateY });
+    })
+
 
   // Render Magnets
   const activeMagnets = magnetsRef.current.filter(m => activeFeatures.has(m.feature)); // Filter for active magnets
@@ -402,9 +443,19 @@ return (
         height="100%" 
         viewBox="0 0 800 600" 
         className="cursor-move"
+        onClick={() => setTooltipData(null)}
       >
         <g ref={containerRef} />
       </svg>
+      {tooltipData && tooltipPosition && (
+        <Tooltip 
+          data={tooltipData}
+          position={tooltipPosition}
+          onMouseEnter={() => {}}
+          onMouseLeave={() => {}} 
+          isUser={tooltipData.id === profile.id}
+        />
+      )}
     </div>
   );
 };
