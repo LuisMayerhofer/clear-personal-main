@@ -92,10 +92,7 @@ useEffect(() => {
   const zoom = d3.zoom<SVGSVGElement, unknown>()
     .scaleExtent([0.5, 5]) 
     .filter((event) => {
-      if (event.type === 'wheel') {
-        return event.ctrlKey;
-      }
-      return !event.ctrlKey && !event.button;
+      return event.type === 'wheel' ? true : !event.button;
     })
     .on('zoom', (event) => {
       container.attr('transform', event.transform);
