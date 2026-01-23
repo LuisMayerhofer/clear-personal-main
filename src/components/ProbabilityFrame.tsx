@@ -2,6 +2,7 @@
 import { FC, useState } from 'react';
 import Info from './Icons/Info';
 import { useTranslations } from 'next-intl';
+import { GRAPH_COLORS } from '@/utils/colors';
 
 type Risk = number | 'good' | 'bad';
 interface ProbabilityFrameProps {
@@ -27,7 +28,7 @@ const ProbabilityFrame: FC<ProbabilityFrameProps> = ({ profile, chosenScenario }
             left: `calc(${probability * 100}% - 12px)`,
             borderLeft: '12px solid transparent',
             borderRight: '12px solid transparent',
-            borderBottom: `24px solid ${type === 'profile' ? '#f87171' : '#60a5fa'}`, // red-400
+            borderBottom: `24px solid ${type === 'profile' ? GRAPH_COLORS.userProfile : GRAPH_COLORS.selectedNode}`,
           }}
         />
         <div
@@ -55,18 +56,30 @@ const ProbabilityFrame: FC<ProbabilityFrameProps> = ({ profile, chosenScenario }
           <ul className="list-inside list-disc">
             <li>
               {t.rich('probability_bar_info_item_1', {
-                low: (chunks) => <span className="text-red-400">{chunks}</span>,
-                high: (chunks) => <span className="text-blue-400">{chunks}</span>,
+                // "Low" -> User/Red Color
+                low: (chunks) => (
+                  <span style={{ color: GRAPH_COLORS.probSliderLeft }}>{chunks}</span>
+                ),
+                // "High" -> Other/Blue Color (Gradient end)
+                high: (chunks) => (
+                  <span style={{ color: GRAPH_COLORS.probSliderRight }}>{chunks}</span>
+                ),
               })}
             </li>
             <li>
               {t.rich('probability_bar_info_item_2', {
-                user: (chunks) => <span className="text-red-400">{chunks}</span>,
+                // "User" -> User/Red Color
+                user: (chunks) => (
+                  <span style={{ color: GRAPH_COLORS.userProfile }}>{chunks}</span>
+                ),
               })}
             </li>
             <li>
               {t.rich('probability_bar_info_item_3', {
-                chosen: (chunks) => <span className="text-blue-400">{chunks}</span>,
+                // "Chosen Scenario" -> Chosen/Mint Color (Corrected from Blue)
+                chosen: (chunks) => (
+                  <span style={{ color: GRAPH_COLORS.selectedNode }}>{chunks}</span>
+                ),
               })}
             </li>
           </ul>
@@ -88,7 +101,7 @@ const ProbabilityFrame: FC<ProbabilityFrameProps> = ({ profile, chosenScenario }
       <div
         className={`absolute inset-0 flex items-center justify-center ${isInfoVisible ? 'blur-xs' : 'blur-none'}`}
       >
-        <div className="relative mx-[16px] h-[43px] w-[90%] rounded-xl bg-gradient-to-r from-red-400 to-blue-400">
+        <div className="relative mx-[16px] h-[43px] w-[90%] rounded-xl" style={{background: `linear-gradient(to right, ${GRAPH_COLORS.probSliderLeft}, ${GRAPH_COLORS.probSliderRight})`}}>
           <p className="absolute -bottom-7 left-1">{t('probability_bar_low_text')}</p>
           <p className="absolute right-1 -bottom-7">{t('probability_bar_high_text')}</p>
           {renderProbability('profile', profile)}
@@ -104,7 +117,7 @@ const ProbabilityFrame: FC<ProbabilityFrameProps> = ({ profile, chosenScenario }
             style={{
               borderLeft: '12px solid transparent',
               borderRight: '12px solid transparent',
-              borderBottom: '24px solid #f87171', // red-400
+              borderBottom: `24px solid ${GRAPH_COLORS.userProfile}`, 
             }}
           />
           <p>{t('probability_bar_legend_user_text')}</p>
@@ -115,7 +128,7 @@ const ProbabilityFrame: FC<ProbabilityFrameProps> = ({ profile, chosenScenario }
             style={{
               borderLeft: '12px solid transparent',
               borderRight: '12px solid transparent',
-              borderBottom: '24px solid #60a5fa', // blue-400
+              borderBottom: `24px solid ${GRAPH_COLORS.selectedNode}`, 
             }}
           />
           <p>{t('probability_bar_legend_chosen_scenario_text')}</p>

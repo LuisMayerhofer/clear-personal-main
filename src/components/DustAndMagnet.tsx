@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { CreditData, DashboardData } from '@/app/[locale]/(main)/dashboard/types';
 import { PlusSquare, MinusSquare, ArrowRotateLeft } from '@/components/Icons';
 import Tooltip from './Tooltip';
+import { GRAPH_COLORS } from '@/utils/colors';
 
 type DnMNode = CreditData & d3.SimulationNodeDatum;
 
@@ -314,9 +315,9 @@ useEffect(() => {
     })
     //TODO: #################################################################################################################################################################
     .attr('fill', (d: DnMNode) => {
-      if (d.id === profile.id) return '#FF5655'; // User Red
-      if (d.id === chosenScenario?.id) return '#14E9C0'; // Chosen Mint Green
-      return '#3B82F6'; // Others Blue
+      if (d.id === profile.id) return GRAPH_COLORS.userProfile; 
+      if (d.id === chosenScenario?.id) return GRAPH_COLORS.selectedNode; 
+      return GRAPH_COLORS.counterfactualNode; 
     })
     .attr('stroke', (d: DnMNode) => d.id === chosenScenario?.id ? '#000' : '#fff')
     .attr('stroke-width', (d: DnMNode) => d.id === chosenScenario?.id ? 2 : 1);

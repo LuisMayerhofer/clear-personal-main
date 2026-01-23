@@ -15,6 +15,7 @@ import { Radar } from 'react-chartjs-2';
 import { CreditData } from '@/app/[locale]/(main)/dashboard/types';
 import { savingCheckingAccountsConverter } from '@/utils/savingCheckingAccountsConverter';
 import { useTranslations } from 'next-intl';
+import { GRAPH_COLORS } from '@/utils/colors';
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 interface SpiderPlotFrameProps {
@@ -69,8 +70,8 @@ const SpiderPlotFrame: FC<SpiderPlotFrameProps> = ({ profile, chosenScenario }) 
           ),
           normalize(profile.features.age, FEATURE_RANGES.age.min, FEATURE_RANGES.age.max),
         ],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: `${GRAPH_COLORS.userProfile}33`,
+        borderColor: GRAPH_COLORS.userProfile,
         borderWidth: 1,
       },
     ],
@@ -102,8 +103,8 @@ const SpiderPlotFrame: FC<SpiderPlotFrameProps> = ({ profile, chosenScenario }) 
         ),
         normalize(chosenScenario.features.age, FEATURE_RANGES.age.min, FEATURE_RANGES.age.max),
       ],
-      backgroundColor: 'rgba(43, 124, 242, 0.2)',
-      borderColor: '#2B7CF2',
+      backgroundColor: `${GRAPH_COLORS.selectedNode}33`,
+      borderColor: GRAPH_COLORS.selectedNode,
       borderWidth: 1,
       borderDash: [4, 4],
     });
