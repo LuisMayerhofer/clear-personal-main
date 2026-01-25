@@ -62,7 +62,7 @@ const DashboardFiltersFrame = () => {
             type="checkbox"
             checked={onlyImproved}
             onChange={toggleOnlyImproved}
-            className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="peer h-4 w-4 rounded border-gray-300 accent-button-background focus:ring-blue-500"
           />
           <span className="text-sm font-semibold text-gray-700">
              {/* TODO: You should add 'only_improved_label' to your en.json/de.json */}
