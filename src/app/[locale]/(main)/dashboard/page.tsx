@@ -104,9 +104,12 @@ const DashboardPage = () => {
           throw error; // Re-throw to be handled by the outer catch
         }
 
+        // Remove Historic Loan Data
+        const activeData = rawData.filter((item: any) => item.counterfactual !== false);
+
         // Step 1: Compute min/max for x and y
-        const xVals = rawData.map((item) => item.x);
-        const yVals = rawData.map((item) => item.y);
+        const xVals = activeData.map((item) => item.x);
+        const yVals = activeData.map((item) => item.y);
 
         const xMin = Math.min(...xVals);
         const xMax = Math.max(...xVals);
@@ -119,7 +122,7 @@ const DashboardPage = () => {
 
         // Find user data point if it exists (only when we have user data)
         const userData = hasUserData
-          ? rawData.find((item) => {
+          ? activeData.find((item) => {
               // Check for the data_type field first (new format)
               if (item.data_type === 'user') return true;
               // Fallback to checking counterfactual field as number
@@ -177,7 +180,7 @@ const DashboardPage = () => {
 
         // Transform the JSON data into the format expected by UMAP
         const transformedData: DashboardData = {
-          scenarios: rawData.map((item) => ({
+          scenarios: activeData.map((item) => ({
             ...item,
             x: normalize(item.x, xMin, xMax),
             y: normalize(item.y, yMin, yMax),

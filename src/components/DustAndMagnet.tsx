@@ -319,6 +319,9 @@ useEffect(() => {
     .attr('fill', (d: DnMNode) => {
       if (d.id === profile.id) return GRAPH_COLORS.userProfile; 
       if (d.id === chosenScenario?.id) return GRAPH_COLORS.selectedNode; 
+      if (d.counterfactual === false ) {
+        return 'grey'; 
+      }
       return GRAPH_COLORS.counterfactualNode; 
     })
     .attr('stroke', (d: DnMNode) => d.id === chosenScenario?.id ? '#000' : '#fff')
