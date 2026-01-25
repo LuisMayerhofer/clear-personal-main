@@ -177,7 +177,8 @@
             "little": "Little",
             "moderate": "Moderate",
             "rich": "Rich"
-        }
+        },
+        "only_improved_label": "Only show high probability scenarios"
     },
     "saved-scenarios-page": {
         "saved_scenarios_title": "Saved Customer Scenarios",

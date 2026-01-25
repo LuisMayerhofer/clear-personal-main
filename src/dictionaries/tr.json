@@ -177,7 +177,8 @@
             "little": "Az",
             "moderate": "Orta",
             "rich": "Yüksek"
-        }
+        },
+        "only_improved_label": "Sadece yüksek olasılıklı senaryoları göster"
     },
     "saved-scenarios-page": {
         "saved_scenarios_title": "Kaydedilmiş Müşteri Senaryoları",

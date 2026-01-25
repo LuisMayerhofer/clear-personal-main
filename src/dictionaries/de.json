@@ -177,7 +177,8 @@
             "little": "Wenig",
             "moderate": "Moderat",
             "rich": "Viel"
-        }
+        },
+        "only_improved_label": "Nur wahrscheinliche Szenarien anzeigen"
     },
     "saved-scenarios-page": {
         "saved_scenarios_title": "Gespeicherte Kundenszenarien",
