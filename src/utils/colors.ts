@@ -1,5 +1,5 @@
 const userProfileColor = '#c41b1b'            //#c41b1b
-const selectionColor = '#def688'              //#1d8522   
+const selectionColor = '#1d8522'              //#1d8522   
 const counterfactualColor = '#1E40AF'         //#1E40AF
 
 export const GRAPH_COLORS = {

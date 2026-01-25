@@ -12,6 +12,7 @@ import Info from '@/components/Icons/Info';
 import { useTranslations } from 'next-intl';
 import { useDashboardStore } from '@/app/stores/dashboardStore';
 import jsonData from '@/python-server/german_credit_umap_with_counterfactuals.json';
+import { GRAPH_COLORS } from '@/utils/colors';
 
 // Helper to map categorical values to numbers
 const categoryToNumber = (val: string) => {
@@ -279,24 +280,29 @@ const DashboardPage = () => {
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex flex-col items-center gap-[24px] rounded-xl bg-white/80 p-[24px] drop-shadow-md">
           <p className="text-xl font-bold">{t('UMAP_info_title')}</p>
-          <p className="text-center">{t.rich('UMAP_info_description', { br: () => <br /> })}</p>
+          <p className="text-center">{t.rich('UMAP_info_description', { br: () => <br />, bold: (chunks) => <span className="font-bold">{chunks}</span> })}</p>
           <ul className="list-inside list-disc">
             <li>
               {t.rich('UMAP_info_item_1', {
-                red: (chunks) => <span className="text-red-400">{chunks}</span>,
+                red: (chunks) => <span style={{color: GRAPH_COLORS.userProfile}}>{chunks}</span>, bold: (chunks) => <span className="font-bold">{chunks}</span>
               })}
             </li>
             <li>
               {t.rich('UMAP_info_item_2', {
-                blue: (chunks) => <span className="text-blue-400">{chunks}</span>,
+                blue: (chunks) => <span style={{color: GRAPH_COLORS.counterfactualNode}}>{chunks}</span>, bold: (chunks) => <span className="font-bold">{chunks}</span>
               })}
             </li>
             <li>
               {t.rich('UMAP_info_item_3', {
-                green: (chunks) => <span className="text-green-400">{chunks}</span>,
+                green: (chunks) => <span style={{color: GRAPH_COLORS.selectedNode}}>{chunks}</span>, bold: (chunks) => <span className="font-bold">{chunks}</span>
               })}
             </li>
-            <li>{t('UMAP_info_item_4')}</li>
+            <li>{t.rich('UMAP_info_item_4', {
+               bold: (chunks) => <span className="font-bold">{chunks}</span>
+            })}</li>
+            <li>{t.rich('UMAP_info_item_5',{
+              bold: (chunks) => <span className="font-bold">{chunks}</span>
+            })}</li>
           </ul>
           <p>{t('UMAP_info_footer')}</p>
         </div>
