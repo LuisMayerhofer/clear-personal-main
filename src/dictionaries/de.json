@@ -87,7 +87,7 @@
         "probability_bar_legend_chosen_scenario_text": "Ausgewähltes Szenario",
         "probability_bar_info_title": "Die Wahrscheinlichkeitsleiste verstehen",
         "probability_bar_info_description": "Diese Leiste hilft Ihnen, die <important>Chancen Ihres Kunden auf Kreditgenehmigung</important> auf einen Blick zu bewerten.",
-        "probability_bar_info_item_1": "Der Farbverlauf geht von <low>rot (niedrige Wahrscheinlichkeit)</low> links zu <high>blau (hohe Wahrscheinlichkeit)</high> rechts.",
+        "probability_bar_info_item_1": "Der Farbverlauf geht von <low>rot (niedrige Wahrscheinlichkeit)</low> links zu <high>grün (hohe Wahrscheinlichkeit)</high> rechts.",
         "probability_bar_info_item_2": "Die <user>aktuelle Markierung ▲</user> zeigt die Wahrscheinlichkeit basierend auf dem ursprünglichen Kundenantrag.",
         "probability_bar_info_item_3": "Wenn Sie ein alternatives Szenario auswählen, erscheint eine <chosen>zweite Markierung ▲</chosen>, die zeigt, wie sich die Wahrscheinlichkeit mit den vorgeschlagenen Anpassungen ändert.",
         "spider_plot_title": "Kundenprofil",
@@ -131,6 +131,14 @@
         "tooltip_credit_amount_text": "Kreditbetrag: {credit_amount, number, :: currency/EUR}",
         "tooltip_duration_text": "Laufzeit: {duration, plural, =1 {ein Monat} other {# Monate}}",
         "tooltip_purpose_text": "Zweck: {purpose, select, car {Auto} furniture {Möbel} radio {Radio/TV} other {andere}}"
+    },
+    "magnets": {
+      "age": "Alter",
+      "credit_amount": "Kreditbetrag",
+      "duration": "Laufzeit",
+      "saving_accounts": "Sparkonten",
+      "checking_account": "Girokonto",
+      "reset_button": "Magnete Zurücksetzen"
     },
     "about_page": {
         "title": "Stärken Sie Ihre Bank, um Kunden besser zu bedienen!",

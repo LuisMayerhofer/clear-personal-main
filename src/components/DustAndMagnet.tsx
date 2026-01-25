@@ -4,6 +4,7 @@ import { CreditData, DashboardData } from '@/app/[locale]/(main)/dashboard/types
 import { PlusSquare, MinusSquare, ArrowRotateLeft } from '@/components/Icons';
 import Tooltip from './Tooltip';
 import { GRAPH_COLORS } from '@/utils/colors';
+import { useTranslations } from 'next-intl';
 
 type DnMNode = CreditData & d3.SimulationNodeDatum;
 
@@ -51,7 +52,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   const [tooltipData, setTooltipData] = useState<CreditData | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
 
-
+  const t = useTranslations('magnets');
 
   const nodes = useMemo<DnMNode[]>(() => {
     // Ensure user profile isn't included twice
@@ -290,12 +291,12 @@ useEffect(() => {
     magGroups.select('text')
       .attr('x', d => (d as any).x)
       .attr('y', d => (d as any).y + 5)
-      .text(d => (d as any).label);
+      .text(d => t((d as any).feature));
 
     return () => {
       simulation.stop();
     };
-  }, [nodes, activeFeatures])
+  }, [nodes, activeFeatures, t])
 
 
 // Visual Styling Effect
@@ -352,7 +353,8 @@ const handleResetMagnets = () => {
     .attr('x', d => (d as any).x - (SIM_CONFIG.baseMagnetWidth * (d as any).scale) / 2)
     .attr('y', d => (d as any).y - (SIM_CONFIG.baseMagnetHight * (d as any).scale) / 2);
   magGroups.select('text').transition().duration(750)
-    .attr('x', d => (d as any).x).attr('y', d => (d as any).y + 5);
+    .attr('x', d => (d as any).x).attr('y', d => (d as any).y + 5)
+    .text(d => t((d as any).feature));;
 
   setActiveFeatures(new Set(DEFAULT_MAGNETS.map(m => m.feature)));  // Activate all Magnets
   if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
@@ -392,7 +394,7 @@ return (
                 className="w-4 h-4 rounded border-gray-300 accent-button-background"
               />
               <span className={`text-sm ${activeFeatures.has(mag.feature) ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>
-                {mag.label}
+                {t(mag.feature)}
               </span>
             </label>
           ))}
@@ -404,7 +406,7 @@ return (
             className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-50 hover:bg-button-background text-blue-800 hover:text-white rounded-lg text-xs font-bold transition-all duration-100 shadow-sm border border-blue-100 hover:border-blue-600 active:scale-95"
             title="Reset Magnets to Defaults"
           >
-            <span className="whitespace-nowrap">Reset Magnets</span>
+            <span className="whitespace-nowrap">{t("reset_button")}</span>
           </button>
         </div>
       </div>

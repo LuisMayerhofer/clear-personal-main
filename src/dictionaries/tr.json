@@ -87,7 +87,7 @@
         "probability_bar_legend_chosen_scenario_text": "Seçilen senaryo",
         "probability_bar_info_title": "Olasılık Çubuğunu Anlama",
         "probability_bar_info_description": "Bu çubuk <important>müşterinin kredi onay şansını</important> bir bakışta değerlendirmenize yardımcı olur.",
-        "probability_bar_info_item_1": "Renk geçişi soldan sağa doğru <low>kırmızı (düşük olasılık)</low>dan <high>maviye (yüksek olasılık)</high> gider.",
+        "probability_bar_info_item_1": "Renk geçişi soldan sağa doğru <low>kırmızı (düşük olasılık)</low>dan <high>yeşile (yüksek olasılık)</high> gider.",
         "probability_bar_info_item_2": "<user>Mevcut gösterge ▲</user> müşterinin orijinal başvurusuna göre olasılığı gösterir.",
         "probability_bar_info_item_3": "Alternatif bir senaryo seçtiğinizde, <chosen>ikinci bir gösterge ▲</chosen> görünür ve önerilen değişikliklerle olasılığın nasıl değiştiğini gösterir.",
         "spider_plot_title": "Müşteri Profili",
@@ -131,6 +131,14 @@
         "tooltip_credit_amount_text": "Kredi Miktarı: {credit_amount, number, :: currency/EUR}",
         "tooltip_duration_text": "Süre: {duration, plural, =1 {bir ay} other {# ay}}",
         "tooltip_purpose_text": "Amaç: {purpose, select, car {araba} furniture {mobilya} radio {radyo/TV} other {diğer}}"
+    },
+    "magnets": {
+      "age": "Yaş",
+      "credit_amount": "Kredi Miktarı",
+      "duration": "Süre",
+      "saving_accounts": "Birikim",
+      "checking_account": "Vadesiz",
+      "reset_button": "Mıknatısları Sıfırla"
     },
     "about_page": {
         "title": "Bankanızın müşterilere daha iyi hizmet vermesini sağlıyoruz!",

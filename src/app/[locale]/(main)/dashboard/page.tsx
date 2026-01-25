@@ -297,12 +297,16 @@ const DashboardPage = () => {
                 green: (chunks) => <span style={{color: GRAPH_COLORS.selectedNode}}>{chunks}</span>, bold: (chunks) => <span className="font-bold">{chunks}</span>
               })}
             </li>
-            <li>{t.rich('UMAP_info_item_4', {
-               bold: (chunks) => <span className="font-bold">{chunks}</span>
-            })}</li>
-            <li>{t.rich('UMAP_info_item_5',{
-              bold: (chunks) => <span className="font-bold">{chunks}</span>
-            })}</li>
+            <li>
+              {t.rich('UMAP_info_item_4', {
+                bold: (chunks) => <span className="font-bold">{chunks}</span>
+              })}
+            </li>
+            <li>
+              {t.rich('UMAP_info_item_5',{
+                bold: (chunks) => <span className="font-bold">{chunks}</span>
+              })}
+            </li>
           </ul>
           <p>{t('UMAP_info_footer')}</p>
         </div>
