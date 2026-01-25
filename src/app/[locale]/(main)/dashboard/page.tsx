@@ -25,8 +25,17 @@ const categoryToNumber = (val: string) => {
 const filterScenarios = (
   scenarios: CreditData[],
   filters: Partial<Record<keyof CreditData['features'], [number, number]>>,
+  onlyImproved: boolean,
+  userRisk: number
 ): CreditData[] => {
   return scenarios.filter((scenario) => {
+    // Optional filter for only show counterfactuals with higher chance of sucesss
+    if (onlyImproved) {
+      const sRisk = typeof scenario.risk === 'number' ? scenario.risk : (scenario.risk === 'good' ? 1 : 0);
+      if (sRisk < userRisk) {
+        return false;
+      }
+    }
     if (!filters) return true;
     for (const key in filters) {
       const typedKey = key as keyof CreditData['features'];
@@ -59,6 +68,7 @@ const DashboardPage = () => {
   const filters = useDashboardStore((state) => state.filters);
   const setFilterRanges = useDashboardStore((state) => state.setFilterRanges);
   const resetFilters = useDashboardStore((state) => state.resetFilters);
+  const onlyImproved = useDashboardStore((state) => state.onlyImproved);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -241,10 +251,14 @@ const DashboardPage = () => {
   }, []);
 
   const filteredScenarios = useMemo(() => {
-    if (!data || !data.scenarios) return [];
+    if (!data || !data.scenarios || !data.profile) return [];
     
-    return filterScenarios(data.scenarios, filters);
-  }, [data?.scenarios, filters]);
+    const userRisk = typeof data.profile.risk === 'number' 
+      ? data.profile.risk 
+      : (data.profile.risk === 'good' ? 1 : 0);
+
+    return filterScenarios(data.scenarios, filters, onlyImproved, userRisk);
+  }, [data?.scenarios, filters, onlyImproved]);
 
   // 3. Early returns now safely come AFTER the hooks
   if (loading) return <p>Loading your application data...</p>;

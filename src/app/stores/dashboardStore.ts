@@ -19,6 +19,8 @@ interface DashboardState {
   resetLikedScenarios: () => void;
   addLikedScenario: (scenario: CreditData) => void;
   removeLikedScenario: (id: number) => void;
+  onlyImproved: boolean;
+  toggleOnlyImproved: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -31,7 +33,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   filters: {},
   setFilter: (filterKey, filterValue) =>
     set((state) => ({ filters: { ...state.filters, [filterKey]: filterValue } })),
-  resetFilters: () => set({ filters: {} }),
+  resetFilters: () => set({ filters: {}, onlyImproved: false }),
   filterRanges: {},
   setFilterRanges: (ranges) => set({ filterRanges: ranges }),
   likedScenarios: [],
@@ -48,4 +50,6 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     }),
   removeLikedScenario: (id) =>
     set((state) => ({ likedScenarios: state.likedScenarios.filter((value) => value.id !== id) })),
+  onlyImproved: false,
+  toggleOnlyImproved: () => set((state) => ({ onlyImproved: !state.onlyImproved })),
 }));

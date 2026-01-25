@@ -15,6 +15,9 @@ const DashboardFiltersFrame = () => {
   const setFilter = useDashboardStore((state) => state.setFilter);
   const resetFilters = useDashboardStore((state) => state.resetFilters);
   const filterRanges = useDashboardStore((state) => state.filterRanges);
+  const onlyImproved = useDashboardStore((state) => state.onlyImproved);
+  const toggleOnlyImproved = useDashboardStore((state) => state.toggleOnlyImproved);
+
   const format = useFormatter();
   const t = useTranslations('dashboard_filters');
 
@@ -50,6 +53,22 @@ const DashboardFiltersFrame = () => {
           {t('reset_button')}
           <ArrowRotateLeft size="xs" color={blue} />
         </button>
+      </div>
+
+      {/* FILTER FOR SCENARIOS OF HIGHER PROBABILITY */}
+      <div className="flex w-full items-center gap-3 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
+        <label className="relative flex cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            checked={onlyImproved}
+            onChange={toggleOnlyImproved}
+            className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm font-semibold text-gray-700">
+             {/* TODO: You should add 'only_improved_label' to your en.json/de.json */}
+             {t.has('only_improved_label') ? t('only_improved_label') : "Only show improved chances"}
+          </span>
+        </label>
       </div>
 
       {/* Duration */}
