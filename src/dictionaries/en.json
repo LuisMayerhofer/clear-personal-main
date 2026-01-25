@@ -74,7 +74,7 @@
         "UMAP_info_item_2": "<blue>Blue Dots ●</blue> are alternative scenarios . If a dot moves towards a magnet (e.g., 'Age'), it means it has a high value for that feature.",
         "UMAP_info_item_3": "Click on any dot to select it. It will turn <green>Green ●</green> and update the detailed charts below.",
         "UMAP_info_item_4": "Use the checkboxes on the left to <bold>add or remove</bold> magnets to focus on different criteria.",
-        "UMAP_info_item_5": "Hold SHIFT while draging a Magnet to change its <bold>magnetic force</bold>",
+        "UMAP_info_item_5": "Hold SHIFT while draging a Magnet to change its <bold>magnetic force</bold>. Use the MOUSEWHEEL or zoom bar to change the <bold>zoom level.</bold>.",
         "UMAP_info_footer": "Explore the scenarios to find the best options to propose to your customer!",
         "UMAP_legend_user_text": "Customer",
         "UMAP_legend_public_loan_data_text": "Historical Loan Data",

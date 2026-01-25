@@ -74,7 +74,7 @@
         "UMAP_info_item_2": "<blue>Blaue Punkte ●</blue> sind alternative Szenarien. Wenn sich ein Punkt zu einem Magneten (z. B. 'Alter') bewegt, bedeutet das, dass er einen hohen Wert für dieses Merkmal hat.",
         "UMAP_info_item_3": "Klicken Sie auf einen beliebigen Punkt, um ihn auszuwählen. Er wird <green>Grün ●</green> und aktualisiert die detaillierten Diagramme unten.",
         "UMAP_info_item_4": "Verwenden Sie die Kontrollkästchen auf der linken Seite, um Magnete <bold>hinzuzufügen oder zu entfernen</bold> und sich auf verschiedene Kriterien zu konzentrieren.",
-        "UMAP_info_item_5": "Halten Sie die UMSCHALT-Taste gedrückt, während Sie einen Magneten ziehen, um dessen <bold>Anziehungskraft</bold> zu ändern.",
+        "UMAP_info_item_5": "Halten Sie die UMSCHALT-Taste gedrückt, während Sie einen Magneten ziehen, um dessen <bold>Anziehungskraft</bold> zu ändern. Verwenden Sie das MAUSRAD oder die Zoomleiste, um die <bold>Zoomstufe</bold> zu ändern.",
         "UMAP_info_footer": "Erkunden Sie die Szenarien, um die besten Optionen für Ihren Kunden zu finden!",
         "UMAP_legend_user_text": "Kunde",
         "UMAP_legend_public_loan_data_text": "Historische Kreditdaten",

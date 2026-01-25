@@ -52,7 +52,8 @@ const DustAndMagnet: React.FC<DnMProps> = ({
   const [tooltipData, setTooltipData] = useState<CreditData | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
 
-  const t = useTranslations('magnets');
+  const t = useTranslations('dashboard');
+  const tMagnets = useTranslations('magnets');
 
   const nodes = useMemo<DnMNode[]>(() => {
     // Ensure user profile isn't included twice
@@ -291,12 +292,12 @@ useEffect(() => {
     magGroups.select('text')
       .attr('x', d => (d as any).x)
       .attr('y', d => (d as any).y + 5)
-      .text(d => t((d as any).feature));
+      .text(d => tMagnets((d as any).feature));
 
     return () => {
       simulation.stop();
     };
-  }, [nodes, activeFeatures, t])
+  }, [nodes, activeFeatures, tMagnets])
 
 
 // Visual Styling Effect
@@ -354,7 +355,7 @@ const handleResetMagnets = () => {
     .attr('y', d => (d as any).y - (SIM_CONFIG.baseMagnetHight * (d as any).scale) / 2);
   magGroups.select('text').transition().duration(750)
     .attr('x', d => (d as any).x).attr('y', d => (d as any).y + 5)
-    .text(d => t((d as any).feature));;
+    .text(d => tMagnets((d as any).feature));;
 
   setActiveFeatures(new Set(DEFAULT_MAGNETS.map(m => m.feature)));  // Activate all Magnets
   if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
@@ -394,7 +395,7 @@ return (
                 className="w-4 h-4 rounded border-gray-300 accent-button-background"
               />
               <span className={`text-sm ${activeFeatures.has(mag.feature) ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>
-                {t(mag.feature)}
+                {tMagnets(mag.feature)}
               </span>
             </label>
           ))}
@@ -406,7 +407,7 @@ return (
             className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-50 hover:bg-button-background text-blue-800 hover:text-white rounded-lg text-xs font-bold transition-all duration-100 shadow-sm border border-blue-100 hover:border-blue-600 active:scale-95"
             title="Reset Magnets to Defaults"
           >
-            <span className="whitespace-nowrap">{t("reset_button")}</span>
+            <span className="whitespace-nowrap">{tMagnets("reset_button")}</span>
           </button>
         </div>
       </div>
@@ -416,25 +417,45 @@ return (
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 flex flex-row gap-2 bg-white/80 p-1 rounded-md shadow-sm border border-gray-200">
         <button 
           onClick={handleZoomOut}
-          className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+          className="py-0.5 px-0.5 hover:bg-gray-200 active:scale-95 duration-50 rounded text-gray-600 transition-colors"
           title="Zoom Out"
         >
-          <MinusSquare color="#B0B0B0" />
+          <MinusSquare size="s" color="#B0B0B0" />
         </button>
         <button 
           onClick={handleResetZoom}
-          className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+          className="py-0.5 px-0.5 hover:bg-gray-200 active:scale-95 duration-50 rounded text-gray-600 transition-colors"
           title="Reset Zoom"
         >
-          <ArrowRotateLeft color="#B0B0B0"/>
+          <ArrowRotateLeft size="s" color="#B0B0B0"/>
         </button>
         <button 
           onClick={handleZoomIn}
-          className="p-1 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+          className="py-0.5 px-0.5 hover:bg-gray-200 active:scale-95 duration-50 rounded text-gray-600 transition-colors"
           title="Zoom In"
         >
-          <PlusSquare color="#B0B0B0" />
+          <PlusSquare size="s" color="#B0B0B0" />
         </button>
+      </div>
+
+      {/* COLOR LEGEND */}
+      <div className="absolute bottom-0 left z-10 flex flex-row gap-4 rounded-md border border-gray-200 bg-white/80 p-2 shadow-sm bg-white/90">
+
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: GRAPH_COLORS.userProfile }}></div>
+          <span className="text-xs font-medium text-gray-700">{t('UMAP_legend_user_text')}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+           <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: GRAPH_COLORS.selectedNode }}></div>
+           <span className="text-xs font-medium text-gray-700">{t('UMAP_legend_chosen_scenario_text')}</span>
+        </div>
+
+
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: GRAPH_COLORS.counterfactualNode }}></div>
+          <span className="text-xs font-medium text-gray-700">{t('UMAP_legend_alternative_scenarios_text')}</span>
+        </div>
       </div>
 
       <svg 

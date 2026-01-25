@@ -74,7 +74,7 @@
         "UMAP_info_item_2": "<blue>Mavi Noktalar ●</blue> alternatif senaryolardır. Bir nokta bir mıknatısa (örn. 'Yaş') doğru hareket ederse, bu o özellik için yüksek bir değere sahip olduğu anlamına gelir.",
         "UMAP_info_item_3": "Seçmek için herhangi bir noktaya tıklayın. Nokta <green>Yeşil ●</green> renge dönecek ve aşağıdaki detaylı grafikleri güncelleyecektir.",
         "UMAP_info_item_4": "Farklı kriterlere odaklanmak amacıyla mıknatıs <bold>eklemek veya kaldırmak</bold> için soldaki onay kutularını kullanın.",
-        "UMAP_info_item_5": "Bir Mıknatısın <bold>çekim gücünü</bold> değiştirmek için sürüklerken SHIFT tuşunu basılı tutun.",
+        "UMAP_info_item_5": "Bir Mıknatısın <bold>çekim gücünü</bold> değiştirmek için sürüklerken SHIFT tuşunu basılı tutun. <bold>Yakınlaştırma seviyesini</bold> değiştirmek için FARE TEKERLEĞİNİ veya yakınlaştırma çubuğunu kullanın.",
         "UMAP_info_footer": "Müşterinize sunabileceğiniz en iyi seçenekleri bulmak için senaryoları keşfedin!",
         "UMAP_legend_user_text": "Müşteri",
         "UMAP_legend_public_loan_data_text": "Geçmiş Kredi Verisi",
