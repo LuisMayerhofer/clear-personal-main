@@ -389,7 +389,7 @@ return (
                 type="checkbox" 
                 checked={activeFeatures.has(mag.feature)}
                 onChange={() => handleToggleMagnet(mag.feature)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-500"
+                className="w-4 h-4 rounded border-gray-300 accent-button-background"
               />
               <span className={`text-sm ${activeFeatures.has(mag.feature) ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>
                 {mag.label}
@@ -401,7 +401,7 @@ return (
         <div className="flex justify-center px-1 pb-1">
           <button 
             onClick={handleResetMagnets} 
-            className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-lg text-xs font-bold transition-all duration-100 shadow-sm border border-blue-100 hover:border-blue-600 active:scale-95"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-50 hover:bg-button-background text-blue-800 hover:text-white rounded-lg text-xs font-bold transition-all duration-100 shadow-sm border border-blue-100 hover:border-blue-600 active:scale-95"
             title="Reset Magnets to Defaults"
           >
             <span className="whitespace-nowrap">Reset Magnets</span>
