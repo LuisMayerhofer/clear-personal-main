@@ -17,7 +17,7 @@ const LearnMorePage = async () => {
         <p>{t('description_3')}</p>
         <p>{t('description_4')}</p>
       </section>
-      <Link className="button" href="/your-application">
+      <Link className="button" href="/dashboard">
         {t('get_started_button')}
       </Link>
     </div>

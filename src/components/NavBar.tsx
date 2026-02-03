@@ -53,7 +53,12 @@ const NavBar: FC = () => {
       <ul>
         {navItems.map(({ id, href, icon }) => (
           <li key={id}>
-            <NavBarItem href={href} label={navBarTexts(id)} icon={icon} />
+            <NavBarItem 
+              href={href} 
+              label={navBarTexts(id)} 
+              icon={icon} 
+              disabled={id === 'your_application' || id === 'get_assistance' || id === 'data_privacy' || id === 'about_clear'}                    // Disables navigation Items
+            />
           </li>
         ))}
       </ul>

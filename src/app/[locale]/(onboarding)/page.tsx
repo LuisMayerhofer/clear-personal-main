@@ -16,7 +16,7 @@ const WelcomePage = async () => {
           <p className="text-2xl font-semibold">{t('description')}</p>
         </section>
         <section className="flex flex-col items-center gap-[24px]">
-          <Link className="button" href="your-application">
+          <Link className="button" href="dashboard">
             {t('get_started_button')}
           </Link>
           <Link className="text-xl font-semibold" href="learn-more">
