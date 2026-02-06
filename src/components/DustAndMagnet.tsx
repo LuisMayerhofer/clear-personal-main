@@ -29,6 +29,7 @@ interface Magnet {
 	scale: number;
 }
 
+//#region Config
 const DEFAULT_MAGNETS: Magnet[] = [
 	{ x: 100, y: 100, feature: 'age', label: 'Age', scale: 1 },
 	{ x: 700, y: 100, feature: 'credit_amount', label: 'Credit Amount', scale: 1 },
@@ -38,9 +39,9 @@ const DEFAULT_MAGNETS: Magnet[] = [
 ];
 
 const SIM_CONFIG = {
-	forceMultiplier: 0.01, // Strength of magnetic pull (Higher = faster movement) [cite: 84]
-	alphaDecay: 0.02, // Cooling rate (Lower = simulation runs longer before stopping) [cite: 55]
-	velocityDecay: 0.6, // "Visual Friction" (Higher = heavier dust feel, prevents orbiting) [cite: 70, 97]
+	forceMultiplier: 0.01, // Strength of magnetic pull (Higher = faster movement) 
+	alphaDecay: 0.02, // Cooling rate (Lower = simulation runs longer before stopping)
+	velocityDecay: 0.6, // "Visual Friction" (Higher = heavier dust feel, prevents orbiting) 
 	initialAlpha: 1.0, // Initial energy of the simulation
 	baseMagnetWidth: 120,
 	baseMagnetHight: 50,
@@ -50,20 +51,20 @@ const SIM_CONFIG = {
 	minWinSizeY: -300,
 	maxWinSizeY: 900,
 };
+//#endregion
 
 const DustAndMagnet: React.FC<DnMProps> = ({
 	scenarios,
 	profile,
 	onScenarioSelect,
 	isInfoVisible,
-	chosenScenario, // Make sure this is destructured
+	chosenScenario, 
 }) => {
 	const svgRef = useRef<SVGSVGElement>(null);
 	const containerRef = useRef<SVGGElement>(null);
 	const simulationRef = useRef<d3.Simulation<DnMNode, undefined> | null>(null);
 	const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
-	// Initialized with a copy of DEFAULT_MAGNETS
 	const magnetsRef = useRef(DEFAULT_MAGNETS.map((m) => ({ ...m })));
 
 	const [activeFeatures, setActiveFeatures] = useState<Set<string>>(
@@ -113,7 +114,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		svg.on('dblclick.zoom', null); // Disable double-click zoom
 		zoomBehaviorRef.current = zoom;
 
-		// Initialize simulation
+		//#region Simulation Init
 		const simulation = d3
 			.forceSimulation<DnMNode>(nodes)
 			.alpha(SIM_CONFIG.initialAlpha)
@@ -129,7 +130,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 						const rawVal = node.features[mag.feature as keyof typeof node.features];
 						let val = 0;
 
-						//* Normalization
+						// Normalization
 						// Handle Numeric Features
 						if (typeof rawVal === 'number') {
 							if (mag.feature === 'credit_amount') {
@@ -139,7 +140,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 							} else if (mag.feature === 'duration') {
 								val = (rawVal - 6) / (72 - 6);
 							} else {
-								val = rawVal / 3; // Fallback for 'job' (0-3)
+								val = rawVal / 3; 
 							}
 						}
 
@@ -164,7 +165,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 						totalVx += dx * pull;
 						totalVy += dy * pull;
 
-						// Prevents nodes from disappearing under the magnet
+						// "Border Force" to prevents nodes from disappearing under the magnet
 						const buffer = 5;
 						const magW = (SIM_CONFIG.baseMagnetWidth * (mag.scale || 1)) / 2 + buffer;
 						const magH = (SIM_CONFIG.baseMagnetHight * (mag.scale || 1)) / 2 + buffer;
@@ -179,7 +180,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 					node.vx = totalVx;
 					node.vy = totalVy;
 
-					// Bounding box constraints
+					// Window size Bounding box constraints
 					const r = 10; // Collision radius from the walls
 					if (node.x! < SIM_CONFIG.minWinSizeX + r) node.x = SIM_CONFIG.minWinSizeX + r;
 					if (node.x! > SIM_CONFIG.maxWinSizeX - r) node.x = SIM_CONFIG.maxWinSizeX - r;
@@ -194,8 +195,9 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			});
 
 		simulationRef.current = simulation;
+		//#endregion
 
-		// Magnet Drag
+		//#region Magnet Drag
 		const drag = d3
 			.drag<SVGGElement, Magnet>()
 			.on('start', function () {
@@ -205,7 +207,6 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.on('drag', function (event: d3.D3DragEvent<SVGGElement, Magnet, Magnet>, d) {
 				if (event.sourceEvent.shiftKey) {
 					// --- SHIFT + DRAG: SCALE ---
-					// Moving mouse up decreases dy, so we subtract it to increase scale
 					const sensitivity = 0.01;
 					d.scale = Math.max(0.5, Math.min(3, d.scale - event.dy * sensitivity));
 				} else {
@@ -241,8 +242,10 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 					simulationRef.current.alpha(0.3).restart();
 				}
 			});
+		//#endregion
 
-		// Render initial dust and magnets
+		//#region Rendering
+		// Render Dust
 		container
 			.selectAll('circle')
 			.data(nodes)
@@ -253,7 +256,6 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 
 				event.stopPropagation();
 
-				// 3. Calculate Position (Pixel-based logic from before)
 				const svgBounds = svgRef.current?.getBoundingClientRect();
 				if (!svgBounds) return;
 				const x = event.clientX - svgBounds.left;
@@ -269,7 +271,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 				} else if (x < 200) {
 					translateX = '0%';
 				}
-				// 4. Show Tooltip
+
 				setTooltipData(d as CreditData);
 				setTooltipPosition({ x, y, translateX, translateY });
 			});
@@ -315,6 +317,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		return () => {
 			simulation.stop();
 		};
+		//#endregion
 	}, [nodes, activeFeatures, tMagnets, onScenarioSelect]);
 
 	// Visual Styling Effect
@@ -337,7 +340,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 					riskValue = risk === 'good' ? 1 : 0;
 				}
 
-				return 3 + Math.pow(riskValue, 1.5) * 22; // Size coding based on risk [cite: 139]
+				return 3 + Math.pow(riskValue, 1.5) * 22; 
 			})
 			.attr('fill', (d: DnMNode) => {
 				if (d.id === profile.id) return GRAPH_COLORS.userProfile;
@@ -389,10 +392,11 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.attr('y', (d) => d.y + 5)
 			.text((d) => tMagnets(d.feature));
 
-		setActiveFeatures(new Set(DEFAULT_MAGNETS.map((m) => m.feature))); // Activate all Magnets
+		setActiveFeatures(new Set(DEFAULT_MAGNETS.map((m) => m.feature))); 
 		if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
 	};
 
+	// Zoom
 	const handleZoomIn = () => {
 		if (svgRef.current && zoomBehaviorRef.current) {
 			d3.select(svgRef.current)
@@ -418,6 +422,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		}
 	};
 
+	//#region HTML
 	return (
 		<div className={`relative h-full w-full flex-1 ${isInfoVisible ? 'blur-xs' : ''}`}>
 			{/* MAGNET MANAGEMENT SIDEBAR */}
@@ -530,5 +535,5 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		</div>
 	);
 };
-
+//#endregion
 export default DustAndMagnet;
