@@ -1,21 +1,21 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --light-text-color: #202224;
+	--background: #ffffff;
+	--foreground: #171717;
+	--light-text-color: #202224;
 }
 
 @theme {
-  --drop-shadow-md: 6px 6px 54px rgba(0, 0, 0, 0.05); 
+	--drop-shadow-md: 6px 6px 54px rgba(0, 0, 0, 0.05);
 }
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-button-background: var(--color-blue-800);
-  --color-button-text: var(--color-white);
-  --color-text: var(--light-text-color);
-  --color-logo: var(--color-blue-700)
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-button-background: var(--color-blue-800);
+	--color-button-text: var(--color-white);
+	--color-text: var(--light-text-color);
+	--color-logo: var(--color-blue-700);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -26,12 +26,12 @@
 } */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
 }
 
 /*TODO: p {
@@ -39,11 +39,11 @@ body {
 } */
 
 .button {
-  background-color: var(--color-button-background);
-  color: var(--color-button-text);
-  padding: 12px 36px;
-  border-radius: var(--radius-2xl);
-  font-size: var(--text-2xl);
-  line-height: var(--text-2xl--line-height);
-  font-weight: 600;
+	background-color: var(--color-button-background);
+	color: var(--color-button-text);
+	padding: 12px 36px;
+	border-radius: var(--radius-2xl);
+	font-size: var(--text-2xl);
+	line-height: var(--text-2xl--line-height);
+	font-weight: 600;
 }

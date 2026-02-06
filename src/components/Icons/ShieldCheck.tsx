@@ -3,21 +3,21 @@ import { IconProps } from './Icon';
 import { DEFAULT_ICON_COLOR, DEFAULT_ICON_SIZE, iconSizeMapper } from '@/lib/icon';
 
 const ShieldCheck: React.FC<IconProps> = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={iconSizeMapper[props.size ?? DEFAULT_ICON_SIZE]}
-    height={iconSizeMapper[props.size ?? DEFAULT_ICON_SIZE]}
-    fill="none"
-    viewBox="0 0 24 24"
-    {...props}
-  >
-    <path
-      stroke={props.color ?? DEFAULT_ICON_COLOR}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="m9.6 11.188 1.8 1.8 3.6-3.6m-10.2-3.6 5.59-2.795a3.6 3.6 0 0 1 3.22 0l5.59 2.795v8.028c0 2.772-2.562 4.643-7.2 7.572-4.638-2.93-7.2-5.4-7.2-7.572V5.788Z"
-    />
-  </svg>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		width={iconSizeMapper[props.size ?? DEFAULT_ICON_SIZE]}
+		height={iconSizeMapper[props.size ?? DEFAULT_ICON_SIZE]}
+		fill="none"
+		viewBox="0 0 24 24"
+		{...props}
+	>
+		<path
+			stroke={props.color ?? DEFAULT_ICON_COLOR}
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth={2}
+			d="m9.6 11.188 1.8 1.8 3.6-3.6m-10.2-3.6 5.59-2.795a3.6 3.6 0 0 1 3.22 0l5.59 2.795v8.028c0 2.772-2.562 4.643-7.2 7.572-4.638-2.93-7.2-5.4-7.2-7.572V5.788Z"
+		/>
+	</svg>
 );
 export default ShieldCheck;

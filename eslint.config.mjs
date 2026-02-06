@@ -6,20 +6,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
-  baseDirectory: __dirname,
+	baseDirectory: __dirname,
 });
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript', 'plugin:prettier/recommended'),
-  {
-    rules: {
-      'no-else-return': 'error',
-      'no-nested-ternary': 'error',
-      'no-shadow': 'error',
-      'no-unneeded-ternary': 'error',
-      'no-useless-return': 'error',
-    },
-  },
+	...compat.extends('next/core-web-vitals', 'next/typescript', 'plugin:prettier/recommended'),
+	{
+		rules: {
+			'no-else-return': 'error',
+			'no-nested-ternary': 'error',
+			'no-shadow': 'error',
+			'no-unneeded-ternary': 'error',
+			'no-useless-return': 'error',
+		},
+	},
 ];
 
 export default eslintConfig;

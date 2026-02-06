@@ -5,7 +5,7 @@ import { Locale } from '@/dictionaries';
 import Germany from './Germany';
 
 export const flags: Record<Locale, FC<SVGProps<SVGSVGElement>>> = {
-  en: UK,
-  tr: Turkey,
-  de: Germany,
+	en: UK,
+	tr: Turkey,
+	de: Germany,
 };

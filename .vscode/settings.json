@@ -1,6 +1,6 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-    "r.lsp.promptToInstall": false
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"r.lsp.promptToInstall": false
 }

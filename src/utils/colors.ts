@@ -1,13 +1,13 @@
-const userProfileColor = '#c41b1b'            //#c41b1b
-const selectionColor = '#1d8522'              //#1d8522   
-const counterfactualColor = '#1E40AF'         //#1E40AF
+const userProfileColor = '#c41b1b'; //#c41b1b
+const selectionColor = '#1d8522'; //#1d8522
+const counterfactualColor = '#1E40AF'; //#1E40AF
 
 export const GRAPH_COLORS = {
-  userProfile: userProfileColor,           
-  selectedNode: selectionColor,             
-  counterfactualNode: counterfactualColor,    
-  probSliderLeft: userProfileColor, 
-  probSliderRight: selectionColor
+	userProfile: userProfileColor,
+	selectedNode: selectionColor,
+	counterfactualNode: counterfactualColor,
+	probSliderLeft: userProfileColor,
+	probSliderRight: selectionColor,
 };
 
 /*
