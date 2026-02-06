@@ -128,11 +128,10 @@ const DashboardPage = () => {
 				const yMin = Math.min(...yVals);
 				const yMax = Math.max(...yVals);
 
-				
 				const normalize = (val: number, min: number, max: number): number =>
 					max - min === 0 ? 0.5 : (val - min) / (max - min);
 
-				// Find user data point if it exists 
+				// Find user data point if it exists
 				const userData = hasUserData
 					? activeData.find((item) => {
 							if (item.data_type === 'user') return true;

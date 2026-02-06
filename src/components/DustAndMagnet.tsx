@@ -39,9 +39,9 @@ const DEFAULT_MAGNETS: Magnet[] = [
 ];
 
 const SIM_CONFIG = {
-	forceMultiplier: 0.01, // Strength of magnetic pull (Higher = faster movement) 
+	forceMultiplier: 0.01, // Strength of magnetic pull (Higher = faster movement)
 	alphaDecay: 0.02, // Cooling rate (Lower = simulation runs longer before stopping)
-	velocityDecay: 0.6, // "Visual Friction" (Higher = heavier dust feel, prevents orbiting) 
+	velocityDecay: 0.6, // "Visual Friction" (Higher = heavier dust feel, prevents orbiting)
 	initialAlpha: 1.0, // Initial energy of the simulation
 	baseMagnetWidth: 120,
 	baseMagnetHight: 50,
@@ -58,7 +58,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 	profile,
 	onScenarioSelect,
 	isInfoVisible,
-	chosenScenario, 
+	chosenScenario,
 }) => {
 	const svgRef = useRef<SVGSVGElement>(null);
 	const containerRef = useRef<SVGGElement>(null);
@@ -140,7 +140,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 							} else if (mag.feature === 'duration') {
 								val = (rawVal - 6) / (72 - 6);
 							} else {
-								val = rawVal / 3; 
+								val = rawVal / 3;
 							}
 						}
 
@@ -340,7 +340,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 					riskValue = risk === 'good' ? 1 : 0;
 				}
 
-				return 3 + Math.pow(riskValue, 1.5) * 22; 
+				return 3 + Math.pow(riskValue, 1.5) * 22;
 			})
 			.attr('fill', (d: DnMNode) => {
 				if (d.id === profile.id) return GRAPH_COLORS.userProfile;
@@ -392,7 +392,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.attr('y', (d) => d.y + 5)
 			.text((d) => tMagnets(d.feature));
 
-		setActiveFeatures(new Set(DEFAULT_MAGNETS.map((m) => m.feature))); 
+		setActiveFeatures(new Set(DEFAULT_MAGNETS.map((m) => m.feature)));
 		if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
 	};
 
