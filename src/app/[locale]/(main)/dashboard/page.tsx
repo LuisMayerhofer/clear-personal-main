@@ -29,8 +29,13 @@ const filterScenarios = (
 	return scenarios.filter((scenario) => {
 		// Optional filter for only show counterfactuals with higher chance of sucesss
 		if (onlyImproved) {
-			const sRisk =
-				typeof scenario.risk === 'number' ? scenario.risk : scenario.risk === 'good' ? 1 : 0;
+			let sRisk: number;
+			if (typeof scenario.risk === 'number') {
+				sRisk = scenario.risk;
+			} else {
+				sRisk = scenario.risk === 'good' ? 1 : 0;
+			}
+
 			if (sRisk < userRisk) {
 				return false;
 			}
@@ -89,8 +94,7 @@ const DashboardPage = () => {
 					);
 
 					if (hasUserData) {
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						rawData = dynamicData.map((item: any) => ({
+						rawData = dynamicData.map((item) => ({
 							...item,
 							// Convert risk to number if it's a string
 							risk: (() => {
@@ -114,7 +118,7 @@ const DashboardPage = () => {
 				}
 
 				// Remove Historic Loan Data
-				const activeData = rawData.filter((item: any) => item.counterfactual !== false);
+				const activeData = rawData.filter((item) => item.counterfactual !== false);
 
 				// Step 1: Compute min/max for x and y
 				const xVals = activeData.map((item) => item.x);
@@ -253,7 +257,12 @@ const DashboardPage = () => {
 		if (!data || !data.scenarios || !data.profile) return [];
 
 		const currentRisk = data.profile.risk;
-		const userRisk = typeof currentRisk === 'number' ? currentRisk : currentRisk === 'good' ? 1 : 0;
+		let userRisk: number;
+		if (typeof currentRisk === 'number') {
+			userRisk = currentRisk;
+		} else {
+			userRisk = currentRisk === 'good' ? 1 : 0;
+		}
 
 		return filterScenarios(data.scenarios, filters, onlyImproved, userRisk);
 	}, [data, filters, onlyImproved]);

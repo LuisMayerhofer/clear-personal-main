@@ -17,11 +17,17 @@ const NavBarItem: FC<NavBarItemProps> = ({ label, icon, href, disabled }) => {
 
 	const Icon = icons[icon];
 
+	const getIconColor = () => {
+		if (isActive) return '#fff';
+		if (disabled) return '#B0B0B0';
+		return undefined;
+	};
+
 	const content = (
 		<div
 			className={`flex min-w-[190px] items-center gap-[14px] rounded-md px-[18px] py-[12px] font-semibold ${isActive ? 'bg-button-background text-button-text' : ''} ${disabled ? 'cursor-not-allowed opacity-40 grayscale' : 'cursor-pointer'}`}
 		>
-			<Icon color={isActive ? '#fff' : disabled ? '#B0B0B0' : undefined} />
+			<Icon color={getIconColor()} />
 			<p>{label}</p>
 		</div>
 	);

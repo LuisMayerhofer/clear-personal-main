@@ -158,7 +158,6 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 
 						const dx = mag.x - node.x!;
 						const dy = mag.y - node.y!;
-						const distance = Math.sqrt(dx * dx + dy * dy) || 1;
 
 						// Scale the strength by the magnet's current scale
 						const pull = val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier;
@@ -302,16 +301,16 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		// Centering and Scaling logic for all magnets (enter + update)
 		magGroups
 			.select('rect')
-			.attr('width', (d) => SIM_CONFIG.baseMagnetWidth * (d as any).scale)
-			.attr('height', (d) => SIM_CONFIG.baseMagnetHight * (d as any).scale)
-			.attr('x', (d) => (d as any).x - (SIM_CONFIG.baseMagnetWidth * (d as any).scale) / 2)
-			.attr('y', (d) => (d as any).y - (SIM_CONFIG.baseMagnetHight * (d as any).scale) / 2);
+			.attr('width', (d) => SIM_CONFIG.baseMagnetWidth * d.scale)
+			.attr('height', (d) => SIM_CONFIG.baseMagnetHight * d.scale)
+			.attr('x', (d) => d.x - (SIM_CONFIG.baseMagnetWidth * d.scale) / 2)
+			.attr('y', (d) => d.y - (SIM_CONFIG.baseMagnetHight * d.scale) / 2);
 
 		magGroups
 			.select('text')
-			.attr('x', (d) => (d as any).x)
-			.attr('y', (d) => (d as any).y + 5)
-			.text((d) => tMagnets((d as any).feature));
+			.attr('x', (d) => d.x)
+			.attr('y', (d) => d.y + 5)
+			.text((d) => tMagnets(d.feature));
 
 		return () => {
 			simulation.stop();
@@ -331,7 +330,13 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.attr('r', (d) => {
 				if (d.id === profile.id) return 10;
 				const risk = d.risk;
-				const riskValue = typeof risk === 'number' ? risk : risk === 'good' ? 1 : 0;
+				let riskValue: number;
+				if (typeof risk === 'number') {
+					riskValue = risk;
+				} else {
+					riskValue = risk === 'good' ? 1 : 0;
+				}
+
 				return 3 + Math.pow(riskValue, 1.5) * 22; // Size coding based on risk [cite: 139]
 			})
 			.attr('fill', (d: DnMNode) => {
@@ -364,25 +369,25 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		if (!containerRef.current) return;
 		const container = d3.select(containerRef.current);
 		const magGroups = container
-			.selectAll('.magnet')
-			.data(magnetsRef.current, (d: any) => d.feature);
+			.selectAll<SVGGElement, Magnet>('.magnet')
+			.data(magnetsRef.current, (d) => (d as Magnet).feature);
 
 		magGroups.transition().duration(750).ease(d3.easeCubicInOut);
 		magGroups
 			.select('rect')
 			.transition()
 			.duration(750)
-			.attr('width', (d) => SIM_CONFIG.baseMagnetWidth * (d as any).scale)
-			.attr('height', (d) => SIM_CONFIG.baseMagnetHight * (d as any).scale)
-			.attr('x', (d) => (d as any).x - (SIM_CONFIG.baseMagnetWidth * (d as any).scale) / 2)
-			.attr('y', (d) => (d as any).y - (SIM_CONFIG.baseMagnetHight * (d as any).scale) / 2);
+			.attr('width', (d) => SIM_CONFIG.baseMagnetWidth * d.scale)
+			.attr('height', (d) => SIM_CONFIG.baseMagnetHight * d.scale)
+			.attr('x', (d) => d.x - (SIM_CONFIG.baseMagnetWidth * d.scale) / 2)
+			.attr('y', (d) => d.y - (SIM_CONFIG.baseMagnetHight * d.scale) / 2);
 		magGroups
 			.select('text')
 			.transition()
 			.duration(750)
-			.attr('x', (d) => (d as any).x)
-			.attr('y', (d) => (d as any).y + 5)
-			.text((d) => tMagnets((d as any).feature));
+			.attr('x', (d) => d.x)
+			.attr('y', (d) => d.y + 5)
+			.text((d) => tMagnets(d.feature));
 
 		setActiveFeatures(new Set(DEFAULT_MAGNETS.map((m) => m.feature))); // Activate all Magnets
 		if (simulationRef.current) simulationRef.current.alpha(0.5).restart();
