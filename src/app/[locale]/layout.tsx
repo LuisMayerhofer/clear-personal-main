@@ -19,7 +19,7 @@ const RootLayout = async ({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: Locale }>;
+  params: Promise<{ locale: string }>;
 }) => {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
@@ -29,7 +29,7 @@ const RootLayout = async ({
   return (
     <html lang={locale}>
       <body className={`${nunitoSans.className} flex h-screen flex-col antialiased`}>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={locale}>
           <TopBar />
           {children}
         </NextIntlClientProvider>
