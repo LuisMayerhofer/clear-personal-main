@@ -58,7 +58,6 @@ __pycache__/
 src/python-server/results.csv
 src/python-server/joint_credit_data.csv
 src/python-server/umap_german_credit_*.png
-src/python-server/german_credit_umap_with_counterfactuals.json
 src/r-server/results/*.csv
 src/r-server/results/generation_log.txt
 # Ignore germanc_credit_umap_with_counterfactuals.json in assets folder 
