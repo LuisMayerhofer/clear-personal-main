@@ -55,7 +55,7 @@ const DashboardFiltersFrame = () => {
 				</button>
 			</div>
 
-			{/* FILTER FOR SCENARIOS OF HIGHER PROBABILITY */}
+			{/* New Filter for higher probability scenarios */}
 			<div className="flex w-full items-center gap-3 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
 				<label className="relative flex cursor-pointer items-center gap-3">
 					<input
@@ -65,7 +65,6 @@ const DashboardFiltersFrame = () => {
 						className="peer accent-button-background h-4 w-4 rounded border-gray-300 focus:ring-blue-500"
 					/>
 					<span className="text-sm font-semibold text-gray-700">
-						{/* TODO: You should add 'only_improved_label' to your en.json/de.json */}
 						{t.has('only_improved_label') ? t('only_improved_label') : 'Only show improved chances'}
 					</span>
 				</label>

@@ -27,7 +27,7 @@ const filterScenarios = (
 	userRisk: number,
 ): CreditData[] => {
 	return scenarios.filter((scenario) => {
-		// Optional filter for only show counterfactuals with higher chance of sucesss
+		// Optional filter for only showing counterfactuals with higher chance of sucesss
 		if (onlyImproved) {
 			let sRisk: number;
 			if (typeof scenario.risk === 'number') {
@@ -117,10 +117,9 @@ const DashboardPage = () => {
 					throw error; // Re-throw to be handled by the outer catch
 				}
 
-				// Remove Historic Loan Data
+				//* Remove Historic Loan Data
 				const activeData = rawData.filter((item) => item.counterfactual !== false);
 
-				// Step 1: Compute min/max for x and y
 				const xVals = activeData.map((item) => item.x);
 				const yVals = activeData.map((item) => item.y);
 
@@ -129,22 +128,20 @@ const DashboardPage = () => {
 				const yMin = Math.min(...yVals);
 				const yMax = Math.max(...yVals);
 
-				// Avoid division by zero
+				
 				const normalize = (val: number, min: number, max: number): number =>
 					max - min === 0 ? 0.5 : (val - min) / (max - min);
 
-				// Find user data point if it exists (only when we have user data)
+				// Find user data point if it exists 
 				const userData = hasUserData
 					? activeData.find((item) => {
-							// Check for the data_type field first (new format)
 							if (item.data_type === 'user') return true;
-							// Fallback to checking counterfactual field as number
 							if (typeof item.counterfactual === 'number' && item.counterfactual === 2) return true;
 							return false;
 						})
 					: null;
 
-				// Only proceed if we have actual user data
+				// Only proceed if user data exists
 				if (!userData) {
 					throw new Error('No user data found - user must submit an application first');
 				}
@@ -267,7 +264,6 @@ const DashboardPage = () => {
 		return filterScenarios(data.scenarios, filters, onlyImproved, userRisk);
 	}, [data, filters, onlyImproved]);
 
-	// 3. Early returns now safely come AFTER the hooks
 	if (loading) return <p>Loading your application data...</p>;
 	if (!data)
 		return (
@@ -361,7 +357,7 @@ const DashboardPage = () => {
 						<h2 className="text-xl font-semibold">{t('UMAP_title')}</h2>
 					</div>
 
-					{/* Wrap the DnM component in a flex-1 min-h-0 container */}
+					{/* Dust and Magnet container */}
 					<div className="min-h-0 w-full flex-1 overflow-hidden">
 						<DustAndMagnet
 							scenarios={filteredScenarios}
