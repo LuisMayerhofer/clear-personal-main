@@ -77,12 +77,12 @@
 "131",29,"male",2,"own","little","little",6887,36,"others","bad",0.242146382444298
 "137",66,"male",1,"own","rich","moderate",766,12,"radio/TV","bad",0.63389980083359
 "139",44,"female",1,"rent","little","rich",1881,12,"radio/TV","good",0.732442317517925
-"140",27,"male",0,"own","rich","rich",709,6,"car","good",0.73242526094434
+"140",27,"male",0,"own","rich","rich",709,6,"car","good",0.732425260944339
 "141",30,"female",3,"own","little","moderate",4795,36,"radio/TV","good",0.487266553429535
 "142",27,"male",3,"own","little","little",3416,27,"radio/TV","good",0.487803625004822
 "143",22,"male",2,"own","little","little",2462,18,"furniture","bad",0.692885742782389
 "145",30,"male",2,"own","moderate","moderate",3566,48,"others","good",0.634165184121049
-"146",39,"female",2,"own","little","little",860,6,"car","good",0.554567384166
+"146",39,"female",2,"own","little","little",860,6,"car","good",0.554567384165999
 "148",28,"male",2,"own","little","little",5371,36,"furniture","good",0.400340727155939
 "152",24,"male",2,"own","little","rich",5848,36,"radio/TV","good",0.675358419815356
 "153",29,"female",2,"rent","rich","moderate",7758,24,"car","good",0.655310809601926
@@ -218,7 +218,7 @@
 "410",20,"female",2,"own","little","moderate",1967,24,"radio/TV","good",0.622994364554694
 "416",33,"male",1,"own","little","little",2579,12,"car","bad",0.650263633744923
 "422",47,"male",1,"own","little","moderate",958,12,"car","good",0.723137476863445
-"425",21,"male",2,"rent","little","moderate",2779,18,"car","good",0.63082948753085
+"425",21,"male",2,"rent","little","moderate",2779,18,"car","good",0.630829487530849
 "429",55,"female",0,"free","little","little",1190,18,"others","bad",0.262992149556568
 "431",29,"male",3,"own","little","moderate",11328,24,"others","bad",0.355969910811061
 "432",36,"male",3,"free","little","little",1872,6,"furniture","good",0.732298498263779
@@ -386,7 +386,7 @@
 "727",25,"female",2,"rent","little","little",1882,18,"radio/TV","bad",0.37705647019355
 "728",59,"female",2,"rent","little","moderate",6416,48,"others","bad",0.301829593525757
 "729",36,"male",2,"own","rich","rich",1275,24,"others","good",0.732437486255623
-"730",33,"male",2,"own","little","moderate",6403,24,"radio/TV","good",0.604246927422722
+"730",33,"male",2,"own","little","moderate",6403,24,"radio/TV","good",0.60424692742272
 "731",21,"male",1,"rent","little","little",1987,24,"radio/TV","bad",0.290718610790709
 "732",44,"female",1,"own","little","moderate",760,8,"radio/TV","good",0.795026504547287
 "736",23,"female",3,"rent","little","moderate",11560,24,"car","bad",0.277893444811027
@@ -473,7 +473,7 @@
 "914",31,"male",2,"rent","little","little",3161,24,"others","bad",0.242240081846217
 "915",32,"female",3,"own","little","moderate",18424,48,"others","bad",0.242163841352807
 "917",68,"male",3,"own","little","little",14896,6,"car","bad",0.384467627066491
-"918",33,"male",2,"own","moderate","little",2359,24,"furniture","bad",0.58322718011367
+"918",33,"male",2,"own","moderate","little",2359,24,"furniture","bad",0.583227180113669
 "919",39,"male",3,"rent","little","little",3345,24,"furniture","bad",0.445403690261455
 "922",22,"female",2,"rent","little","little",1366,9,"radio/TV","bad",0.440325371643237
 "923",30,"male",2,"rent","little","moderate",2002,12,"car","good",0.69920090271855
