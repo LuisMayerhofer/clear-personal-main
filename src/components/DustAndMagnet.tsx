@@ -67,6 +67,12 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 
 	const magnetsRef = useRef(DEFAULT_MAGNETS.map((m) => ({ ...m })));
 
+	const onScenarioSelectRef = useRef(onScenarioSelect);
+
+	useEffect(() => {
+		onScenarioSelectRef.current = onScenarioSelect;
+	}, [onScenarioSelect]);
+
 	const [activeFeatures, setActiveFeatures] = useState<Set<string>>(
 		new Set(DEFAULT_MAGNETS.map((m) => m.feature)),
 	);
@@ -94,6 +100,8 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 		}) as DnMNode[];
 	}, [scenarios, profile]);
 
+	const prevNodeIdsRef = useRef<number[]>([]);
+
 	// Main Physics Effect
 	useEffect(() => {
 		if (!svgRef.current || !containerRef.current) return;
@@ -110,91 +118,108 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.on('zoom', (event) => {
 				container.attr('transform', event.transform);
 			});
-		svg.call(zoom);
-		svg.on('dblclick.zoom', null); // Disable double-click zoom
-		zoomBehaviorRef.current = zoom;
+		// Only attach zoom once to prevent jitter
+		if (!zoomBehaviorRef.current) {
+			svg.call(zoom);
+			svg.on('dblclick.zoom', null);
+			zoomBehaviorRef.current = zoom;
+		}
 
 		//#region Simulation Init
-		const simulation = d3
-			.forceSimulation<DnMNode>(nodes)
-			.alpha(SIM_CONFIG.initialAlpha)
-			.alphaDecay(SIM_CONFIG.alphaDecay)
-			.velocityDecay(SIM_CONFIG.velocityDecay)
-			.on('tick', () => {
-				nodes.forEach((node) => {
-					let totalVx = 0;
-					let totalVy = 0;
+		let simulation = simulationRef.current;
+		if (!simulation) {
+			simulation = d3
+				.forceSimulation<DnMNode>()
+				.alphaDecay(SIM_CONFIG.alphaDecay)
+				.velocityDecay(SIM_CONFIG.velocityDecay);
 
-					magnetsRef.current.forEach((mag) => {
-						if (!activeFeatures.has(mag.feature)) return; // Check whether Magnet is active
-						const rawVal = node.features[mag.feature as keyof typeof node.features];
-						let val = 0;
+			simulationRef.current = simulation;
+		}
+		simulation.on('tick', () => {
+			nodes.forEach((node) => {
+				let totalVx = 0;
+				let totalVy = 0;
 
-						// Normalization
-						// Handle Numeric Features
-						if (typeof rawVal === 'number') {
-							if (mag.feature === 'credit_amount') {
-								val = (rawVal - 276) / (18424 - 276);
-							} else if (mag.feature === 'age') {
-								val = (rawVal - 19) / (75 - 19);
-							} else if (mag.feature === 'duration') {
-								val = (rawVal - 6) / (72 - 6);
-							} else {
-								val = rawVal / 3;
-							}
+				magnetsRef.current.forEach((mag) => {
+					if (!activeFeatures.has(mag.feature)) return; // Check whether Magnet is active
+					const rawVal = node.features[mag.feature as keyof typeof node.features];
+					let val = 0;
+
+					// Normalization
+					// Handle Numeric Features
+					if (typeof rawVal === 'number') {
+						if (mag.feature === 'credit_amount') {
+							val = (rawVal - 276) / (18424 - 276);
+						} else if (mag.feature === 'age') {
+							val = (rawVal - 19) / (75 - 19);
+						} else if (mag.feature === 'duration') {
+							val = (rawVal - 6) / (72 - 6);
+						} else {
+							val = rawVal / 3;
 						}
+					}
 
-						// Handle Categorical Strings (Savings & Checking)
-						else if (typeof rawVal === 'string') {
-							const s = rawVal.toLowerCase();
-							if (s === 'little') val = 0.25;
-							else if (s === 'moderate') val = 0.5;
-							else if (s === 'quite rich') val = 0.75;
-							else if (s === 'rich') val = 1.0;
-							else val = 0; // Covers 'NA', 'none', or 'null'
-						}
+					// Handle Categorical Strings (Savings & Checking)
+					else if (typeof rawVal === 'string') {
+						const s = rawVal.toLowerCase();
+						if (s === 'little') val = 0.25;
+						else if (s === 'moderate') val = 0.5;
+						else if (s === 'quite rich') val = 0.75;
+						else if (s === 'rich') val = 1.0;
+						else val = 0; // Covers 'NA', 'none', or 'null'
+					}
 
-						// Ensure val stays within 0-1 range to prevent "super-pulls"
-						val = Math.max(0, Math.min(1, val));
+					// Ensure val stays within 0-1 range to prevent "super-pulls"
+					val = Math.max(0, Math.min(1, val));
 
-						const dx = mag.x - node.x!;
-						const dy = mag.y - node.y!;
+					const dx = mag.x - node.x!;
+					const dy = mag.y - node.y!;
 
-						// Scale the strength by the magnet's current scale
-						const pull = val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier;
-						totalVx += dx * pull;
-						totalVy += dy * pull;
+					// Scale the strength by the magnet's current scale
+					const pull = val * (mag.scale || 1) * SIM_CONFIG.forceMultiplier;
+					totalVx += dx * pull;
+					totalVy += dy * pull;
 
-						// "Border Force" to prevents nodes from disappearing under the magnet
-						const buffer = 5;
-						const magW = (SIM_CONFIG.baseMagnetWidth * (mag.scale || 1)) / 2 + buffer;
-						const magH = (SIM_CONFIG.baseMagnetHight * (mag.scale || 1)) / 2 + buffer;
+					// "Border Force" to prevents nodes from disappearing under the magnet
+					const buffer = 5;
+					const magW = (SIM_CONFIG.baseMagnetWidth * (mag.scale || 1)) / 2 + buffer;
+					const magH = (SIM_CONFIG.baseMagnetHight * (mag.scale || 1)) / 2 + buffer;
 
-						if (Math.abs(dx) < magW && Math.abs(dy) < magH) {
-							totalVx -= dx * SIM_CONFIG.magnetBoundaryForce;
-							totalVy -= dy * SIM_CONFIG.magnetBoundaryForce;
-						}
-					});
-
-					// Apply the summed forces directly to velocity
-					node.vx = totalVx;
-					node.vy = totalVy;
-
-					// Window size Bounding box constraints
-					const r = 10; // Collision radius from the walls
-					if (node.x! < SIM_CONFIG.minWinSizeX + r) node.x = SIM_CONFIG.minWinSizeX + r;
-					if (node.x! > SIM_CONFIG.maxWinSizeX - r) node.x = SIM_CONFIG.maxWinSizeX - r;
-					if (node.y! < SIM_CONFIG.minWinSizeY + r) node.y = SIM_CONFIG.minWinSizeY + r;
-					if (node.y! > SIM_CONFIG.maxWinSizeY - r) node.y = SIM_CONFIG.maxWinSizeY - r;
+					if (Math.abs(dx) < magW && Math.abs(dy) < magH) {
+						totalVx -= dx * SIM_CONFIG.magnetBoundaryForce;
+						totalVy -= dy * SIM_CONFIG.magnetBoundaryForce;
+					}
 				});
 
-				container
-					.selectAll('circle')
-					.attr('cx', (d) => (d as DnMNode).x!)
-					.attr('cy', (d) => (d as DnMNode).y!);
+				// Apply the summed forces directly to velocity
+				node.vx = totalVx;
+				node.vy = totalVy;
+
+				// Window size Bounding box constraints
+				const r = 10; // Collision radius from the walls
+				if (node.x! < SIM_CONFIG.minWinSizeX + r) node.x = SIM_CONFIG.minWinSizeX + r;
+				if (node.x! > SIM_CONFIG.maxWinSizeX - r) node.x = SIM_CONFIG.maxWinSizeX - r;
+				if (node.y! < SIM_CONFIG.minWinSizeY + r) node.y = SIM_CONFIG.minWinSizeY + r;
+				if (node.y! > SIM_CONFIG.maxWinSizeY - r) node.y = SIM_CONFIG.maxWinSizeY - r;
 			});
 
-		simulationRef.current = simulation;
+			container
+				.selectAll('circle')
+				.attr('cx', (d) => (d as DnMNode).x!)
+				.attr('cy', (d) => (d as DnMNode).y!);
+		});
+
+		simulation.nodes(nodes);
+		const currentNodeIds = nodes
+			.map((n) => n.id)
+			.sort()
+			.join(',');
+		const prevNodeIds = prevNodeIdsRef.current.sort().join(',');
+
+		if (currentNodeIds !== prevNodeIds) {
+			simulation.alpha(SIM_CONFIG.initialAlpha).restart();
+			prevNodeIdsRef.current = nodes.map((n) => n.id);
+		}
 		//#endregion
 
 		//#region Magnet Drag
@@ -252,7 +277,7 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.join('circle')
 			.style('cursor', 'pointer')
 			.on('click', (event, d) => {
-				onScenarioSelect(d as CreditData);
+				onScenarioSelectRef.current(d as CreditData);
 
 				event.stopPropagation();
 
@@ -314,11 +339,9 @@ const DustAndMagnet: React.FC<DnMProps> = ({
 			.attr('y', (d) => d.y + 5)
 			.text((d) => tMagnets(d.feature));
 
-		return () => {
-			simulation.stop();
-		};
+		return () => {};
 		//#endregion
-	}, [nodes, activeFeatures, tMagnets, onScenarioSelect]);
+	}, [nodes, activeFeatures, tMagnets]);
 
 	// Visual Styling Effect
 	useEffect(() => {
